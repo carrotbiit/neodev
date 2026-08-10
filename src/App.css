@@ -1,3 +1,39 @@
+/* Matches the canvas sky so overscroll never flashes the default page color. */
+body {
+  background: #1b0b38;
+}
+
+#social .button-icon {
+  filter: invert(1) brightness(2);
+}
+
+.page-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Keep the page content above the background canvas. */
+#root > *:not(.page-background) {
+  position: relative;
+  z-index: 1;
+}
+
+/* The starter palette is tuned for a flat page; retune it for the neon backdrop. */
+#root {
+  --text: #cbb7e8;
+  --text-h: #fff;
+  --border: rgba(209, 127, 255, 0.28);
+  --code-bg: rgba(20, 8, 40, 0.6);
+  --accent: #ffb347;
+  --accent-bg: rgba(255, 179, 71, 0.12);
+  --accent-border: rgba(255, 179, 71, 0.6);
+  --social-bg: rgba(30, 12, 60, 0.55);
+  --shadow: rgba(209, 127, 255, 0.35) 0 8px 24px -4px;
+  color: var(--text);
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
