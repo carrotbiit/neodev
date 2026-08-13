@@ -41,6 +41,19 @@ function toCssSize(value) {
   return typeof value === 'number' ? `${value}px` : value
 }
 
+/** Returns `color` with its alpha multiplied by `factor`, for gradient stops. */
+function fadeAlpha(color, factor) {
+  const rgb = color.match(/rgba?\(([^)]+)\)/)
+  if (rgb) {
+    const [r, g, b, a = 1] = rgb[1].split(',').map(Number)
+    return `rgba(${r}, ${g}, ${b}, ${a * factor})`
+  }
+  const hex = color.replace('#', '')
+  const full = hex.length === 3 ? hex.replace(/./g, (ch) => ch + ch) : hex
+  const n = parseInt(full.slice(0, 6), 16)
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${factor})`
+}
+
 /**
  * Paints the sun once onto an offscreen canvas. The sun never moves, so this
  * only re-runs on resize or when the colors change.
@@ -268,15 +281,23 @@ export default function SynthwaveBackground({
       ctx.fillRect(0, horizonY, width, depth * 0.45)
       ctx.globalAlpha = 1
 
-      // Glow riding the horizon line.
+      // Glow riding the horizon line. Drawn as a wide, flat ellipse centred on
+      // the sun so it falls off in every direction — a rectangle would leave
+      // hard vertical seams where the gradient stops.
       if (p.glow > 0) {
-        const bloom = radius * 0.5 * p.glow
-        const line = ctx.createLinearGradient(0, horizonY - bloom, 0, horizonY + bloom)
-        line.addColorStop(0, 'rgba(0, 0, 0, 0)')
-        line.addColorStop(0.5, c.horizonGlow)
-        line.addColorStop(1, 'rgba(0, 0, 0, 0)')
-        ctx.fillStyle = line
-        ctx.fillRect(cx - radius * 2.2, horizonY - bloom, radius * 4.4, bloom * 2)
+        const glowW = radius * 2.8
+        const glowH = radius * 0.6 * p.glow
+        ctx.save()
+        ctx.translate(cx, horizonY)
+        ctx.scale(glowW, glowH)
+        const bloom = ctx.createRadialGradient(0, 0, 0, 0, 0, 1)
+        bloom.addColorStop(0, c.horizonGlow)
+        bloom.addColorStop(0.4, fadeAlpha(c.horizonGlow, 0.5))
+        bloom.addColorStop(0.7, fadeAlpha(c.horizonGlow, 0.15))
+        bloom.addColorStop(1, fadeAlpha(c.horizonGlow, 0))
+        ctx.fillStyle = bloom
+        ctx.fillRect(-1, -1, 2, 2)
+        ctx.restore()
       }
     }
 
