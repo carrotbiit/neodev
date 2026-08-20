@@ -1,3 +1,14 @@
+html {
+  /* The masthead links jump down the page — ride there instead of teleporting. */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 :root {
   /* Neon palette, shared by every section of the site. */
   --text: #cbb7e8;
@@ -7,8 +18,76 @@
   --grid: #d17fff;
   --sky: #1b0b38;
 
+  /*
+   * Type system. Two faces, and nothing else on the site:
+   *
+   *   --pixel  display type and UI chrome — titles, labels, codes, numerals.
+   *            Always uppercase, always tracked out.
+   *   --sans   running prose, and only running prose.
+   *
+   * Every font-size on the site comes from one of the steps below; no rule
+   * sets a raw size of its own.
+   */
+  /*
+   * The water the wave sweep leaves behind. The transition overlay and the FAQ
+   * section paint this same stack from their own top edge, and the sweep ends
+   * by putting the FAQ's top exactly where the overlay was — so the two agree
+   * pixel for pixel and the handover is invisible.
+   *
+   * The scene is attached to the viewport rather than to either element. That
+   * keeps it composed at a sane scale down a section thousands of pixels tall,
+   * and means the overlay and the section show the same pixels of it without
+   * having to know anything about each other's position.
+   */
+  --sea-image: url('./assets/underwaterbackground.png') center / cover fixed
+    no-repeat;
+  /*
+   * Dusk over the scene, deepening down the page. Stops are in px so they
+   * measure from each element's own top: percentages would resolve against two
+   * different heights and the handover would show.
+   */
+  --sea-column: linear-gradient(
+    180deg,
+    rgba(0, 22, 52, 0.46) 0,
+    rgba(0, 18, 44, 0.56) 700px,
+    rgba(0, 12, 32, 0.74) 1600px,
+    rgba(0, 7, 20, 0.86) 2600px
+  );
+  --sea-floor: #000814;
+
+  /*
+   * Bevelled window chrome, in the site's palette rather than Win95 grey.
+   * Shared: the about section's text viewer and the contact form are the same
+   * furniture, and should stay the same colour.
+   */
+  --chrome: #cfc4e4;
+  --chrome-lit: #f7f3fd;
+  --chrome-dark: #6a5590;
+  --chrome-ink: #2a0f47;
+  --paper: #f7f2fc;
+  --paper-ink: #32164f;
+
+  /*
+   * Height the pinned masthead occupies. The masthead itself is out of flow,
+   * so the first screen reserves exactly this much to keep the hero centred
+   * where it sat when the masthead was still in the document flow.
+   */
+  --masthead-h: 74px;
+
   --pixel: 'Press Start 2P', ui-monospace, Consolas, monospace;
   --sans: 'Chakra Petch', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  --fs-hero: clamp(48px, 11vw, 150px);
+  --fs-hero-sub: clamp(12px, 2.6vw, 34px);
+  --fs-hero-meta: clamp(12px, 1.9vw, 24px);
+  --fs-display: clamp(19px, 5.1vw, 62px);
+  --fs-stat: clamp(20px, 2.4vw, 34px);
+  --fs-button: clamp(13px, 1.5vw, 20px);
+  --fs-nav: 17px;
+  --fs-nav-sm: 14px;
+  --fs-label: clamp(10px, 1.05vw, 12px);
+  --fs-micro: 9px;
+  --fs-body: clamp(15px, 1.15vw, 17px);
 
   font: 18px/145% var(--sans);
   color-scheme: dark;
@@ -21,6 +100,11 @@
 
   @media (max-width: 1024px) {
     font-size: 16px;
+  }
+
+  /* Stacked masthead: nav on one line, socials beneath it. */
+  @media (max-width: 720px) {
+    --masthead-h: 108px;
   }
 }
 

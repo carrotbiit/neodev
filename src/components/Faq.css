@@ -1,0 +1,433 @@
+/* ==========================================================================
+   FAQ — the dive.
+
+   The wave sweep above hands the reader over already underwater, so this
+   section opens straight into the sea. The questions descend on a depth gauge,
+   alternating sides, while the water darkens toward the seabed. Its palette is
+   sampled from wave.png so the sea reads as the same water the wave was.
+
+   Type: steps come from the scale in index.css. --pixel is display type and UI
+   chrome, --sans is running prose. Nothing else.
+   ========================================================================== */
+
+#faq {
+  --foam: #2fd8d8;
+  --sea-line: rgba(47, 216, 216, 0.42);
+  --sea-ink: #d3d0f0;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: left;
+  padding: clamp(60px, 12vh, 140px) 0 0;
+  /* Land clear of the pinned masthead when the nav link jumps here. */
+  scroll-margin-top: 76px;
+
+  /*
+   * The same water the wave sweep leaves behind, painted from the same top
+   * edge — the sweep ends by putting this element's top exactly where the
+   * overlay was, so the handover shows nothing. Defined in index.css.
+   */
+  background: var(--sea-column), var(--sea-image);
+  background-color: var(--sea-floor);
+}
+
+/* ------------------------------------------------------------- the water */
+
+.deep {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Light shafts angling down from the surface. */
+.deep-rays span {
+  position: absolute;
+  top: 0;
+  height: min(1400px, 85%);
+  transform: rotate(var(--tilt));
+  transform-origin: top center;
+  background: linear-gradient(
+    180deg,
+    rgba(186, 232, 255, 0) 0%,
+    rgba(186, 232, 255, 0.2) 34%,
+    rgba(186, 232, 255, 0.07) 62%,
+    rgba(186, 232, 255, 0) 88%
+  );
+  /* Without this the shafts read as flat translucent bars. */
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 38%,
+    #000 62%,
+    transparent 100%
+  );
+  filter: blur(16px);
+  animation: ray-breathe 9s ease-in-out infinite alternate;
+}
+
+@keyframes ray-breathe {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The sprite fills the span; the span only carries position and motion. */
+.deep-bubbles span {
+  position: absolute;
+  bottom: -80px;
+  color: rgba(186, 232, 255, 0.9);
+  animation-name: bubble-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.pixel-bubble {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Keeps the pixels square when the browser scales the sprite up. */
+  image-rendering: pixelated;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  88% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(var(--drift), -125vh) scale(1.15);
+    opacity: 0;
+  }
+}
+
+.seabed {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(120px, 15vw, 220px);
+}
+
+.seabed-far {
+  fill: #021230;
+  stroke: rgba(47, 216, 216, 0.22);
+  stroke-width: 2;
+}
+
+/* Hard steps, no anti-aliasing — see the ridge maths in FaqSection.jsx. */
+.seabed {
+  shape-rendering: crispedges;
+}
+
+.seabed-near {
+  fill: #000610;
+}
+
+/* ------------------------------------------------------------- the content */
+
+.faq-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 56px) clamp(110px, 18vh, 220px);
+}
+
+.faq-head {
+  text-align: center;
+  margin-bottom: clamp(44px, 8vh, 100px);
+}
+
+.faq-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+  /* The title screen's neon, in the wave's own colours — cyan off its streaks,
+     pink off its foam. */
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.85),
+    0 0 26px rgba(47, 216, 216, 0.9),
+    0 0 60px rgba(240, 176, 224, 0.6),
+    0 0 110px rgba(47, 216, 216, 0.5);
+}
+
+/* ------------------------------------------------------------- the descent */
+
+.dive {
+  --gap: clamp(34px, 5vw, 70px);
+
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The gauge line the whole descent hangs off. */
+.dive::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-1px);
+  /* Ticked off in even lengths, like the scale on an instrument. */
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(47, 216, 216, 0.65) 0 9px,
+    rgba(47, 216, 216, 0) 9px 16px
+  );
+  box-shadow: 0 0 14px rgba(47, 216, 216, 0.45);
+}
+
+.station {
+  position: relative;
+  width: calc(50% - var(--gap));
+  margin-bottom: clamp(24px, 4vh, 46px);
+}
+
+.station:nth-child(odd) {
+  margin-right: auto;
+}
+
+.station:nth-child(even) {
+  margin-left: auto;
+}
+
+/* The node sitting on the gauge, and the tick reaching out to the card. */
+.station-mark {
+  position: absolute;
+  top: 24px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--foam);
+  background: #012152;
+  box-shadow: 0 0 16px rgba(47, 216, 216, 0.9);
+}
+
+.station::after {
+  content: '';
+  position: absolute;
+  top: 30px;
+  width: var(--gap);
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(47, 216, 216, 0.6) 0 5px,
+    rgba(47, 216, 216, 0) 5px 9px
+  );
+}
+
+.station:nth-child(odd) .station-mark {
+  right: calc(-1 * var(--gap) - 6px);
+}
+
+.station:nth-child(even) .station-mark {
+  left: calc(-1 * var(--gap) - 7px);
+}
+
+.station:nth-child(odd)::after {
+  right: calc(-1 * var(--gap));
+}
+
+.station:nth-child(even)::after {
+  left: calc(-1 * var(--gap));
+}
+
+/* The depth reading sits across the gauge, filling the facing column. */
+.station-depth {
+  position: absolute;
+  top: 22px;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.22em;
+  color: var(--foam);
+  text-shadow: 0 0 12px rgba(47, 216, 216, 0.8);
+  white-space: nowrap;
+}
+
+.station:nth-child(odd) .station-depth {
+  left: calc(100% + var(--gap) + 20px);
+}
+
+.station:nth-child(even) .station-depth {
+  right: calc(100% + var(--gap) + 20px);
+}
+
+/* ------------------------------------------------------------- the cards */
+
+/*
+ * A readout panel, not a pane of glass: flat fill, a hard two pixel edge and a
+ * solid unblurred shadow dropped behind it — the same language as the beach's
+ * taped photographs and its bevelled window, in the water's colours.
+ */
+.card {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(47, 216, 216, 0.045) 0 7px,
+      rgba(0, 0, 0, 0) 7px 14px
+    ),
+    linear-gradient(180deg, #012456 0%, #001435 100%);
+  border: 2px solid var(--sea-line);
+  box-shadow: 5px 5px 0 rgba(0, 4, 14, 0.55);
+  transition:
+    border-color 0.16s steps(2, end),
+    transform 0.16s steps(2, end),
+    box-shadow 0.16s steps(2, end);
+
+  &:hover {
+    border-color: var(--foam);
+    /* Nudged towards its own shadow, the way a key goes down. */
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 rgba(0, 4, 14, 0.55);
+  }
+}
+
+.card summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px clamp(16px, 2vw, 24px);
+  cursor: pointer;
+  /* Drop the native disclosure triangle in favour of the chevron below. */
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--foam);
+    outline-offset: -4px;
+  }
+}
+
+.card-code {
+  flex: none;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  color: var(--foam);
+  opacity: 0.75;
+}
+
+.card-q {
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #eaf4ff;
+  text-shadow: 0 0 12px rgba(47, 216, 216, 0.7);
+}
+
+.card-toggle {
+  flex: none;
+  width: 0;
+  height: 0;
+  margin-left: auto;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid var(--foam);
+  /* Stepped, so it snaps between states rather than gliding. */
+  transition: transform 0.16s steps(3, end);
+}
+
+.card[open] .card-toggle {
+  transform: rotate(180deg);
+}
+
+.card-a {
+  margin: 0;
+  padding: 16px clamp(16px, 2vw, 24px) 20px;
+  border-top: 2px dashed rgba(47, 216, 216, 0.28);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.75;
+  color: var(--sea-ink);
+}
+
+/* ------------------------------------------------------------------ mobile */
+
+@media (max-width: 820px) {
+  .dive {
+    --gap: 26px;
+  }
+
+  .dive::before {
+    left: 5px;
+  }
+
+  /* Matching the alternating selectors' specificity, or `margin: auto` from
+     the two-column layout wins and the even stations stay pushed over. */
+  .station:nth-child(odd),
+  .station:nth-child(even) {
+    width: auto;
+    margin-left: calc(var(--gap) + 12px);
+    margin-right: 0;
+  }
+
+  /* One column, so every node hangs off the same edge. */
+  .station:nth-child(odd) .station-mark,
+  .station:nth-child(even) .station-mark {
+    left: calc(-1 * var(--gap) - 13px);
+    right: auto;
+  }
+
+  .station:nth-child(odd)::after,
+  .station:nth-child(even)::after {
+    left: calc(-1 * var(--gap));
+    right: auto;
+  }
+
+  /* No facing column to sit in — the depth rides above its card instead. */
+  .station-depth {
+    position: static;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .station:nth-child(odd) .station-depth,
+  .station:nth-child(even) .station-depth {
+    left: auto;
+    right: auto;
+  }
+
+  /* The depth now sits above the card, so the node drops to meet the summary. */
+  .station-mark {
+    top: 44px;
+  }
+
+  .station::after {
+    top: 50px;
+  }
+}
+
+/* All of this is decoration — hold it still on request. */
+@media (prefers-reduced-motion: reduce) {
+  .deep-rays span,
+  .deep-bubbles span {
+    animation: none;
+  }
+
+  .deep-bubbles span {
+    opacity: 0.4;
+  }
+}
