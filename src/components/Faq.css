@@ -169,24 +169,40 @@
 
 /* ------------------------------------------------------------- the descent */
 
+/*
+ * One column, running straight down. The questions used to alternate either
+ * side of a centre line to leave the facing column free for a depth reading;
+ * with those gone the stagger only bought holes — open a card on one side and
+ * everything below it drops, leaving the other side empty.
+ */
 .dive {
-  --gap: clamp(34px, 5vw, 70px);
+  --gap: clamp(26px, 3vw, 44px);
 
   position: relative;
+  /*
+   * A card opening is growth in flow, so everything under it moves down and
+   * everything over it stays put — except that browsers then re-anchor the
+   * scroll to keep the anchored element still, which reads as the page above
+   * jumping. Turn that off and the open card simply pushes down from where it
+   * is.
+   */
+  overflow-anchor: none;
+  /* Held in from the full column: one question per row across the whole page
+     is a long way for one line of answer to run. */
+  max-width: 880px;
+  margin: 0 auto;
   list-style: none;
-  margin: 0;
   padding: 0;
 }
 
-/* The gauge line the whole descent hangs off. */
+/* The line the whole descent hangs off. */
 .dive::before {
   content: '';
   position: absolute;
-  left: 50%;
+  left: 5px;
   top: 0;
   bottom: 0;
   width: 2px;
-  transform: translateX(-1px);
   /* Ticked off in even lengths, like the scale on an instrument. */
   background: repeating-linear-gradient(
     180deg,
@@ -198,22 +214,15 @@
 
 .station {
   position: relative;
-  width: calc(50% - var(--gap));
-  margin-bottom: clamp(24px, 4vh, 46px);
+  margin-left: calc(var(--gap) + 12px);
+  margin-bottom: clamp(18px, 3vh, 34px);
 }
 
-.station:nth-child(odd) {
-  margin-right: auto;
-}
-
-.station:nth-child(even) {
-  margin-left: auto;
-}
-
-/* The node sitting on the gauge, and the tick reaching out to the card. */
+/* The node sitting on the line, and the tick reaching out to the card. */
 .station-mark {
   position: absolute;
   top: 24px;
+  left: calc(-1 * var(--gap) - 13px);
   width: 12px;
   height: 12px;
   border: 2px solid var(--foam);
@@ -225,6 +234,7 @@
   content: '';
   position: absolute;
   top: 30px;
+  left: calc(-1 * var(--gap));
   width: var(--gap);
   height: 2px;
   background: repeating-linear-gradient(
@@ -232,42 +242,6 @@
     rgba(47, 216, 216, 0.6) 0 5px,
     rgba(47, 216, 216, 0) 5px 9px
   );
-}
-
-.station:nth-child(odd) .station-mark {
-  right: calc(-1 * var(--gap) - 6px);
-}
-
-.station:nth-child(even) .station-mark {
-  left: calc(-1 * var(--gap) - 7px);
-}
-
-.station:nth-child(odd)::after {
-  right: calc(-1 * var(--gap));
-}
-
-.station:nth-child(even)::after {
-  left: calc(-1 * var(--gap));
-}
-
-/* The depth reading sits across the gauge, filling the facing column. */
-.station-depth {
-  position: absolute;
-  top: 22px;
-  font-family: var(--pixel);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.22em;
-  color: var(--foam);
-  text-shadow: 0 0 12px rgba(47, 216, 216, 0.8);
-  white-space: nowrap;
-}
-
-.station:nth-child(odd) .station-depth {
-  left: calc(100% + var(--gap) + 20px);
-}
-
-.station:nth-child(even) .station-depth {
-  right: calc(100% + var(--gap) + 20px);
 }
 
 /* ------------------------------------------------------------- the cards */
@@ -319,15 +293,6 @@
   }
 }
 
-.card-code {
-  flex: none;
-  font-family: var(--pixel);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.12em;
-  color: var(--foam);
-  opacity: 0.75;
-}
-
 .card-q {
   font-family: var(--pixel);
   font-size: var(--fs-label);
@@ -346,8 +311,6 @@
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   border-top: 9px solid var(--foam);
-  /* Stepped, so it snaps between states rather than gliding. */
-  transition: transform 0.16s steps(3, end);
 }
 
 .card[open] .card-toggle {
@@ -364,60 +327,41 @@
   color: var(--sea-ink);
 }
 
-/* ------------------------------------------------------------------ mobile */
+/*
+ * Opening the card. `<details>` has nothing to animate by default — the answer
+ * is simply there or not — so the panel it is kept in gets a height to run
+ * from nothing up to its own, which needs `interpolate-size` in index.css for
+ * `auto` to be a value that can be travelled to.
+ *
+ * Browsers without `::details-content` drop this rule whole and the card opens
+ * at once, which is why the answer carries its own arrival below: that half
+ * works everywhere, and the two read as one movement where both run.
+ */
+.card::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.3s ease-out,
+    content-visibility 0.3s allow-discrete;
+}
 
-@media (max-width: 820px) {
-  .dive {
-    --gap: 26px;
-  }
+.card[open]::details-content {
+  block-size: auto;
+}
 
-  .dive::before {
-    left: 5px;
+/* Only a fade: the panel's own height is what moves the answer into place, and
+   travelling on top of that reads as the card opening upward into itself. */
+@keyframes card-drop {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
 
-  /* Matching the alternating selectors' specificity, or `margin: auto` from
-     the two-column layout wins and the even stations stay pushed over. */
-  .station:nth-child(odd),
-  .station:nth-child(even) {
-    width: auto;
-    margin-left: calc(var(--gap) + 12px);
-    margin-right: 0;
-  }
-
-  /* One column, so every node hangs off the same edge. */
-  .station:nth-child(odd) .station-mark,
-  .station:nth-child(even) .station-mark {
-    left: calc(-1 * var(--gap) - 13px);
-    right: auto;
-  }
-
-  .station:nth-child(odd)::after,
-  .station:nth-child(even)::after {
-    left: calc(-1 * var(--gap));
-    right: auto;
-  }
-
-  /* No facing column to sit in — the depth rides above its card instead. */
-  .station-depth {
-    position: static;
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .station:nth-child(odd) .station-depth,
-  .station:nth-child(even) .station-depth {
-    left: auto;
-    right: auto;
-  }
-
-  /* The depth now sits above the card, so the node drops to meet the summary. */
-  .station-mark {
-    top: 44px;
-  }
-
-  .station::after {
-    top: 50px;
-  }
+.card[open] .card-a {
+  animation: card-drop 0.3s ease-out both;
 }
 
 /* All of this is decoration — hold it still on request. */
@@ -429,5 +373,14 @@
 
   .deep-bubbles span {
     opacity: 0.4;
+  }
+
+  /* The card still opens; it just stops travelling to get there. */
+  .card::details-content {
+    transition: none;
+  }
+
+  .card[open] .card-a {
+    animation: none;
   }
 }

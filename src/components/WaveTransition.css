@@ -2,8 +2,8 @@
    The wave sweep between the beach and the sea.
 
    `.tide` is a zero-height marker sitting between the two sections. The stage
-   above it carries the wave and the strip of foam at its waterline, both moved
-   by `transform` alone from the rAF loop in WaveTransition.jsx.
+   above it carries the wave, moved by `transform` alone from the rAF loop in
+   WaveTransition.jsx.
 
    The sea the wave uncovers is not painted here — it is the FAQ itself, held
    out of flow and revealed as the wave passes. See `.tide-held` below.
@@ -51,65 +51,15 @@
   will-change: clip-path;
 }
 
-/*
- * The water the wave is standing in. It rides with the waterline, wide enough
- * to sit under the whole picture and fading out at both ends.
- *
- * Two jobs. The wave has a ragged silhouette — open sky above its crest, a
- * hole inside its curl — so without something behind it the reader sees the
- * FAQ's own scene through the gaps, which is a busy picture to break a wave
- * against. And the clip's edge is dead straight, which the wave cannot be
- * relied on to cover either. Flat blue does both, and being flat it can fade
- * into the questions on one side and the beach on the other without ever
- * drawing an edge of its own.
- */
-.tide-foam {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  /* Width and placement come from the wave's size — see FOAM_BACK and
-     FOAM_AHEAD in WaveTransition.jsx. The fade below is set against them. */
-  /*
-   * Averaged off the FAQ's own water, top to bottom. Flat, but flat in the
-   * sea's colour: the strip has to end somewhere, and the only place it can
-   * end without drawing a line is in water the same shade as the water it is
-   * handing over to.
-   */
-  background: #37709b;
-  will-change: transform;
-
-  /*
-   * Opaque under the wave and across the clip's edge; gone by either end, into
-   * the questions it has just uncovered and into the beach ahead. The trailing
-   * fade is the long one — it is what the FAQ comes up through, so it wants to
-   * be a rise rather than an edge passing over.
-   */
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 34%,
-    #000 80%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 34%,
-    #000 80%,
-    transparent 100%
-  );
-}
-
 .tide-wave {
   position: absolute;
-  top: 50%;
   left: 0;
-  /* Sized from JS — the waterline maths depends on it, so one place owns it. */
+  /* Sized and hung from JS — the waterline maths depends on both, so one place
+     owns them. See WALL and CROP_TOP in WaveTransition.jsx. */
   will-change: transform;
 
-  /* The trailing side dissolves into the water it has already uncovered, so
-     the wave and the sea behind it read as one body. */
+  /* The trailing side dissolves into the sea it has already uncovered, so the
+     wave and the water behind it read as one body. */
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 2%,

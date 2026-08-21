@@ -3,39 +3,33 @@ import './Faq.css'
 
 /**
  * FAQ, staged as a dive. The wave sweep above has already put the reader under
- * the water; from here the questions descend into the dark on a depth gauge,
- * each one a station further down.
+ * the water; from here the questions descend into the dark on a line, each one
+ * a station further down than the last.
  */
 
 /** Placeholder answers — swap once the real copy is written. */
 const FAQS = [
   {
-    depth: '10',
     q: 'Who can join?',
     a: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
   },
   {
-    depth: '25',
     q: 'What does it cost?',
     a: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
   },
   {
-    depth: '40',
     q: 'Do I need a team?',
     a: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint.',
   },
   {
-    depth: '60',
     q: 'What should I build?',
     a: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   },
   {
-    depth: '85',
     q: 'What do I bring?',
     a: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.',
   },
   {
-    depth: '120',
     q: 'How do I sign up?',
     a: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.',
   },
@@ -153,17 +147,11 @@ export default function FaqSection() {
         </header>
 
         <ol className="dive">
-          {FAQS.map((faq, i) => (
+          {FAQS.map((faq) => (
             <li className="station" key={faq.q}>
               <span className="station-mark" aria-hidden="true" />
-              <span className="station-depth" aria-hidden="true">
-                −{faq.depth} M
-              </span>
               <details className="card">
                 <summary>
-                  <span className="card-code" aria-hidden="true">
-                    Q_{String(i + 1).padStart(2, '0')}
-                  </span>
                   <span className="card-q">{faq.q}</span>
                   <span className="card-toggle" aria-hidden="true" />
                 </summary>

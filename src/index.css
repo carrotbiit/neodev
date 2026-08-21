@@ -10,6 +10,13 @@ html {
 }
 
 :root {
+  /*
+   * Lets `auto` be a value an animation can travel to, which is what the FAQ
+   * cards need to open from nothing to whatever height their answer comes to.
+   * On its own it animates nothing — it only makes the keyword interpolable.
+   */
+  interpolate-size: allow-keywords;
+
   /* Neon palette, shared by every section of the site. */
   --text: #cbb7e8;
   --text-h: #fff;

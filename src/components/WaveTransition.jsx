@@ -23,29 +23,61 @@ import './WaveTransition.css'
  * nothing on screen because the two renderings are the same one.
  */
 
-/** Scroll distance needed to cross the screen, as a multiple of the viewport. */
-const SWEEP = 1.15
+/**
+ * Scroll distance needed to cross the screen, as a multiple of the viewport.
+ * Well under one: the wave is far wider than the screen now, so a short push
+ * still carries it a long way, and holding the reader for a whole screen of
+ * scrolling to get through made it read as a toll rather than a crossing.
+ */
+const SWEEP = 0.8
 
-/** Wave height as a multiple of the viewport, so the whole picture reads. */
-const WALL = 1.06
+/**
+ * How much of the picture is let off the top and bottom of the screen. What is
+ * left between them is what fills it, so these also set the size: the wave is
+ * scaled until the kept band is exactly one screen tall.
+ */
+const CROP_TOP = 0.1
+const CROP_BOTTOM = 0.15
 
-/** Where the waterline sits across the (square) image, 0–1. */
-const FACE = 0.66
+/** Wave height as a multiple of the viewport, from the crop above. */
+const WALL = 1 / (1 - CROP_TOP - CROP_BOTTOM)
 
-/** Share of the remaining distance covered per frame — the gesture's smoothing. */
-const EASE = 0.16
+/**
+ * Where the waterline sits across the (square) image, 0–1. Set to the face of
+ * the wave rather than the lip of its curl: nothing is painted behind the
+ * picture, so the clip's straight edge hides behind the water itself, and only
+ * through the middle of the image is that water unbroken over the whole band
+ * the crop keeps. A little further right and the hollow of the curl opens up,
+ * and the edge would show straight through it.
+ */
+const FACE = 0.48
+
+/**
+ * Share of the remaining distance covered per frame — the gesture's smoothing.
+ * Enough to take the steps out of a wheel, little enough that the wave still
+ * reads as something the reader is pushing rather than something playing back.
+ */
+const EASE = 0.22
+
+/**
+ * How fast the sweep starts, against how fast it would run at an even rate.
+ * A wave does not cross at a constant speed — it gathers — so an even push
+ * moves it slowly while it is still building and quickly once it is running.
+ */
+const GATHER = 0.4
+
+/**
+ * Shapes progress into distance. Both ends are pinned (0 stays 0, 1 stays 1),
+ * so everything that reads those as the ends of the sweep is untouched: this
+ * only changes where the wave is in between. Backwards it reads the same curve
+ * the other way, so the sweep gathers going out and settles coming back.
+ */
+function shape(p) {
+  return p * (GATHER + (1 - GATHER) * p)
+}
 
 /** Keeps both ends of the sweep clear of the screen. */
 const CUSHION = 48
-
-/**
- * The strip of water the wave stands in, as multiples of the wave's own size —
- * how far it reaches back behind the waterline and how far ahead of it. Sized
- * from the wave rather than fixed so it covers the picture at every viewport.
- * Its fade is in the CSS, and reads against these.
- */
-const FOAM_BACK = 0.96
-const FOAM_AHEAD = 0.3
 
 /** Wheel deltas arrive in pixels, lines or pages depending on the browser. */
 const LINE = 16
@@ -70,13 +102,11 @@ const KEYS = {
 export default function WaveTransition() {
   const anchorRef = useRef(null)
   const stageRef = useRef(null)
-  const foamRef = useRef(null)
   const waveRef = useRef(null)
 
   useEffect(() => {
     const anchor = anchorRef.current
     const stage = stageRef.current
-    const foam = foamRef.current
     const wave = waveRef.current
     const depths = document.querySelector('.depths')
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -130,7 +160,9 @@ export default function WaveTransition() {
       wall = window.innerHeight * WALL
       wave.style.width = `${wall}px`
       wave.style.height = `${wall}px`
-      foam.style.width = `${wall * (FOAM_BACK + FOAM_AHEAD)}px`
+      // Hung so the kept band starts at the top of the screen and the rest of
+      // the picture runs off both ends.
+      wave.style.top = `${-CROP_TOP * wall}px`
     }
 
     /** Offset at which the beach's last line sits on the bottom of the screen. */
@@ -140,20 +172,13 @@ export default function WaveTransition() {
       const width = window.innerWidth
       const tail = wall * FACE
       const lead = wall - tail
-      const back = wall * FOAM_BACK
-      /*
-       * The waterline runs from just off the left of the screen to just off
-       * the right, with enough overshoot at both ends to carry everything that
-       * trails it clear of the screen. The strip of water reaches further back
-       * than the picture does, so it is what sets the overshoot — sized to the
-       * wave alone, the strip would still be lying over the questions when the
-       * sweep ended.
-       */
-      const trail = Math.max(tail, back)
-      const edge = -lead - CUSHION + p * (width + trail + lead + CUSHION * 2)
+      // The waterline runs from just off the left of the screen to just off
+      // the right, with enough overshoot at both ends to carry the whole
+      // picture clear of it.
+      const edge =
+        -lead - CUSHION + shape(p) * (width + tail + lead + CUSHION * 2)
 
-      wave.style.transform = `translate3d(${edge - tail}px, -50%, 0)`
-      foam.style.transform = `translate3d(${edge - back}px, 0, 0)`
+      wave.style.transform = `translate3d(${edge - tail}px, 0, 0)`
       // How much of the depths is still clipped away, measured from the right.
       depths.style.setProperty(
         '--reveal',
@@ -489,7 +514,6 @@ export default function WaveTransition() {
   return (
     <div className="tide" ref={anchorRef}>
       <div className="tide-stage" ref={stageRef} data-active="false" aria-hidden="true">
-        <div className="tide-foam" ref={foamRef} />
         <img className="tide-wave" ref={waveRef} src={waveUrl} alt="" />
       </div>
     </div>

@@ -32,7 +32,7 @@ function App() {
     <>
       <SynthwaveBackground
         className="page-background"
-        speed={2}
+        speed={0.9}
         horizon={0.58}
         sunSize={0.3}
       />

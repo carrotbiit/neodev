@@ -25,6 +25,11 @@ const DEFAULT_COLORS = {
   haze: '#2d1055',
   /** Glow sitting on the horizon line itself. */
   horizonGlow: 'rgba(233, 106, 255, 0.06)',
+  /** Wireframe mountains flanking the road. */
+  mountain: '#3fd8ff',
+  mountainGlow: 'rgba(63, 216, 255, 0.65)',
+  /** Opaque face the wireframe sits on, so near ridges hide far ones. */
+  mountainFill: '#160a33',
 }
 
 const DEFAULTS = {
@@ -52,6 +57,197 @@ function fadeAlpha(color, factor) {
   const full = hex.length === 3 ? hex.replace(/./g, (ch) => ch + ch) : hex
   const n = parseInt(full.slice(0, 6), 16)
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${factor})`
+}
+
+const MOUNTAINS = {
+  /** Distance from the centre line, in grid columns, where the range starts. */
+  inner: 3.4,
+  /** Where it ends — well past the canvas edge at close range. */
+  outer: 14,
+  columns: 26,
+  /**
+   * Depth the mesh is kept alive to. The whole nearest strip — not just its
+   * front edge — has to clear the side of the canvas before it is recycled,
+   * or dropping it pops a visible band off the bottom corners. At `inner`
+   * columns out that means `near + step` must stay under half the grid
+   * density, which is what pins these two numbers together.
+   */
+  near: 0.1,
+  /** World depth between ridges. Half of them carry a drawn ridge line. */
+  step: 0.35,
+  rows: 52,
+  /** Peak height in eye-heights — anything above 1 breaks the horizon. */
+  amplitude: 1.5,
+  /** How many columns the slope takes to climb from the roadside to full height. */
+  ramp: 3,
+}
+
+/** Deterministic hash in [0, 1) — stands in for a seeded random table. */
+function hash2(x, y) {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453
+  return n - Math.floor(n)
+}
+
+function valueNoise(x, y) {
+  const xi = Math.floor(x)
+  const yi = Math.floor(y)
+  const xf = x - xi
+  const yf = y - yi
+  const u = xf * xf * (3 - 2 * xf)
+  const v = yf * yf * (3 - 2 * yf)
+  const a = hash2(xi, yi)
+  const b = hash2(xi + 1, yi)
+  const c = hash2(xi, yi + 1)
+  const d = hash2(xi + 1, yi + 1)
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
+}
+
+/**
+ * Terrain height at (x, z) in eye-heights. Ridged noise — folding the octaves
+ * around their midpoint gives creased peaks rather than rolling dunes — faded
+ * to nothing near the road so the floor stays clear.
+ */
+function terrainHeight(x, z) {
+  let sum = 0
+  let amp = 1
+  let norm = 0
+  let fx = 0.42
+  let fz = 0.34
+  for (let o = 0; o < 3; o++) {
+    sum += amp * (1 - Math.abs(valueNoise(x * fx, z * fz) * 2 - 1))
+    norm += amp
+    amp *= 0.5
+    fx *= 2.1
+    fz *= 2.1
+  }
+  const ridged = Math.pow(sum / norm, 1.4)
+  const ramp = Math.min(1, Math.max(0, (Math.abs(x) - MOUNTAINS.inner) / MOUNTAINS.ramp))
+  return ridged * ramp * ramp * MOUNTAINS.amplitude
+}
+
+/** Mixes two hex colors, `t` running 0 -> `a`, 1 -> `b`. */
+function mixHex(a, b, t) {
+  const parse = (hex) => {
+    const h = hex.replace('#', '')
+    const full = h.length === 3 ? h.replace(/./g, (ch) => ch + ch) : h
+    const n = parseInt(full.slice(0, 6), 16)
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+  }
+  const [r1, g1, b1] = parse(a)
+  const [r2, g2, b2] = parse(b)
+  const m = (x, y) => Math.round(x + (y - x) * t)
+  return `rgb(${m(r1, r2)}, ${m(g1, g2)}, ${m(b1, b2)})`
+}
+
+/**
+ * Wireframe ranges flanking the road, one mirrored copy per side.
+ *
+ * Each ridge is pinned to a fixed world depth and sampled there, so the range
+ * is rigid: it slides down the screen in perspective exactly like the floor
+ * rows rather than rippling in place. Ridges that pass the camera are dropped
+ * and new ones appear at the back. Strips are painted far to near onto an
+ * opaque face, which is what stops distant ridges showing through the ones in
+ * front of them.
+ */
+function drawMountains(ctx, view) {
+  const { height, horizonY, cx, K, columnGap, travel, colors, glow } = view
+  const { inner, outer, columns, near, step, rows } = MOUNTAINS
+  const far = near + (rows - 1) * step
+  // Index of the first ridge still in front of the camera. Ridges live at
+  // fixed multiples of `step` in world space, so this is what recycles them.
+  const first = Math.ceil((travel + near) / step)
+
+  ctx.save()
+  ctx.lineJoin = 'round'
+  ctx.lineWidth = 1.1
+  ctx.strokeStyle = colors.mountain
+  if (glow > 0) {
+    ctx.shadowColor = colors.mountainGlow
+    ctx.shadowBlur = 5 * glow
+  }
+
+  for (const side of [-1, 1]) {
+    // Built back to front, so the painter's pass below can walk it in order.
+    const grid = []
+    for (let i = rows - 1; i >= 0; i--) {
+      const worldZ = (first + i) * step
+      const z = worldZ - travel
+      const scale = 1 / z
+      const index = first + i
+      const row = {
+        index,
+        fog: Math.min(1, Math.max(0, (far - z) / (far - 2))),
+        points: [],
+      }
+      for (let j = 0; j < columns; j++) {
+        const xw = side * (inner + (outer - inner) * (j / (columns - 1)))
+        const h = terrainHeight(xw, worldZ)
+        row.points.push({
+          x: cx + xw * columnGap * scale,
+          y: horizonY + K * (1 - h) * scale,
+        })
+      }
+      grid.push(row)
+    }
+
+    for (let i = 0; i < rows - 1; i++) {
+      const back = grid[i]
+      const front = grid[i + 1]
+
+      // Opaque face for this strip, tinted toward the haze with distance.
+      ctx.save()
+      ctx.shadowBlur = 0
+      ctx.beginPath()
+      back.points.forEach((p, j) => (j ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)))
+      for (let j = front.points.length - 1; j >= 0; j--) {
+        ctx.lineTo(front.points[j].x, front.points[j].y)
+      }
+      ctx.closePath()
+      ctx.fillStyle = mixHex(colors.haze, colors.mountainFill, front.fog)
+      ctx.fill()
+      ctx.restore()
+
+      ctx.globalAlpha = 0.12 + 0.62 * front.fog
+      ctx.beginPath()
+      // Ridge lines on every other plane, so halving `step` to keep the mesh
+      // alive longer does not double how busy the wireframe looks. The parity
+      // is taken from the absolute plane index, so the drawn lines travel with
+      // the terrain instead of flickering between planes.
+      if (front.index % 2 === 0) {
+        front.points.forEach((p, j) => (j ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)))
+      }
+      // Seams running back into the screen, on every strip.
+      for (let j = 0; j < columns; j++) {
+        ctx.moveTo(back.points[j].x, back.points[j].y)
+        ctx.lineTo(front.points[j].x, front.points[j].y)
+      }
+      ctx.stroke()
+    }
+
+    // Curtain hanging off the nearest ridge down past the bottom edge. The
+    // strips only cover the surface itself, so without this the floor shows
+    // through underneath the closest slopes.
+    const nearest = grid[grid.length - 1].points
+    ctx.save()
+    ctx.shadowBlur = 0
+    ctx.globalAlpha = 1
+    ctx.beginPath()
+    nearest.forEach((p, j) => (j ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)))
+    ctx.lineTo(nearest[nearest.length - 1].x, height + 10)
+    ctx.lineTo(nearest[0].x, height + 10)
+    ctx.closePath()
+    ctx.fillStyle = colors.mountainFill
+    ctx.fill()
+    ctx.restore()
+
+    ctx.globalAlpha = 1
+    ctx.beginPath()
+    nearest.forEach((p, j) => (j ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)))
+    ctx.stroke()
+  }
+
+  ctx.globalAlpha = 1
+  ctx.restore()
 }
 
 /**
@@ -155,6 +351,9 @@ export default function SynthwaveBackground({
     let sunRadius = 0
     let sunKey = ''
     let phase = 0
+    // Total distance travelled. The mountains are pinned to absolute world
+    // depths, so this must not wrap — a wrap would jump the terrain.
+    let travel = 0
     let last = performance.now()
     let frame = 0
 
@@ -181,7 +380,9 @@ export default function SynthwaveBackground({
       last = now
       if (!reduceMotion.matches) {
         // One unit of phase == one grid row passing the viewer.
-        phase = (phase + delta * p.speed * 0.55) % 1
+        const step = delta * p.speed * 0.55
+        phase = (phase + step) % 1
+        travel += step
       }
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -280,6 +481,19 @@ export default function SynthwaveBackground({
       ctx.fillStyle = haze
       ctx.fillRect(0, horizonY, width, depth * 0.45)
       ctx.globalAlpha = 1
+
+      // Mountains last of the scene geometry: they stand in front of both the
+      // floor and the sun.
+      drawMountains(ctx, {
+        height,
+        horizonY,
+        cx,
+        K,
+        columnGap,
+        travel,
+        colors: c,
+        glow: p.glow,
+      })
 
       // Glow riding the horizon line. Drawn as a wide, flat ellipse centred on
       // the sun so it falls off in every direction — a rectangle would leave
