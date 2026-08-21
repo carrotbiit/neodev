@@ -179,14 +179,6 @@
   --gap: clamp(26px, 3vw, 44px);
 
   position: relative;
-  /*
-   * A card opening is growth in flow, so everything under it moves down and
-   * everything over it stays put — except that browsers then re-anchor the
-   * scroll to keep the anchored element still, which reads as the page above
-   * jumping. Turn that off and the open card simply pushes down from where it
-   * is.
-   */
-  overflow-anchor: none;
   /* Held in from the full column: one question per row across the whole page
      is a long way for one line of answer to run. */
   max-width: 880px;
@@ -264,7 +256,8 @@
   transition:
     border-color 0.16s steps(2, end),
     transform 0.16s steps(2, end),
-    box-shadow 0.16s steps(2, end);
+    box-shadow 0.16s steps(2, end),
+    translate var(--press-out) var(--press-out-ease);
 
   &:hover {
     border-color: var(--foam);
@@ -315,6 +308,35 @@
 
 .card[open] .card-toggle {
   transform: rotate(180deg);
+}
+
+/*
+ * The card is the control, not the summary strip inside it — the whole panel
+ * should go down when the question is clicked. So the press travel is moved off
+ * the summary and onto its card; see the press section in index.css.
+ */
+.card summary:active {
+  translate: none;
+}
+
+.card:has(summary:active) {
+  translate: 0 var(--press-drop);
+  transition-duration:
+    0.16s,
+    0.16s,
+    0.16s,
+    var(--press-in);
+  transition-timing-function:
+    steps(2, end),
+    steps(2, end),
+    steps(2, end),
+    var(--press-in-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:has(summary:active) {
+    translate: none;
+  }
 }
 
 .card-a {

@@ -3,6 +3,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/*
+ * Scroll anchoring off, page-wide. When an FAQ card opens, the browser picks
+ * something further down — a later question, or the contact section — as its
+ * anchor and scrolls to hold that still, which drags everything above the card
+ * up the screen. The card is growth in flow: what is under it should move down
+ * and what is over it should not move at all. Scoping this to the FAQ list is
+ * not enough, because the anchor the browser chooses is usually below it.
+ */
+html,
+body {
+  overflow-anchor: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -139,4 +152,91 @@ body {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------- press */
+
+/*
+ * Every control on the site goes down under the finger and springs back up on
+ * release — the one piece of feedback shared by the neon buttons, the nav, the
+ * socials and the FAQ cards, so a click always feels like the same click.
+ *
+ * The travel is on the `translate` property rather than inside `transform`.
+ * Several of these elements already animate `transform` for their own reasons
+ * (the FAQ card leans into its shadow on hover, the card's chevron flips when
+ * it opens); `translate` composes with those instead of overwriting them, so a
+ * control can be pressed and doing its own thing at the same time.
+ *
+ * Down is short and linear — it should already be at the bottom by the time a
+ * normal click lets go. Up is longer and overshoots slightly, which is the part
+ * that reads as springy.
+ */
+:root {
+  --press-drop: 3px;
+  --press-in: 55ms;
+  --press-out: 260ms;
+  --press-in-ease: cubic-bezier(0.4, 0, 1, 1);
+  --press-out-ease: cubic-bezier(0.18, 1.5, 0.42, 1);
+}
+
+/*
+ * The standard controls, caught by tag rather than by class, so a button or a
+ * link added later is pressable the moment it exists. `.press` is the opt-in
+ * for anything clickable that is none of these — see CLAUDE.md.
+ */
+button,
+summary,
+a[href],
+input[type='submit'],
+input[type='button'],
+[role='button'],
+.press {
+  transition: translate var(--press-out) var(--press-out-ease);
+  /* No blue flash on tap — the press itself is the feedback. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active,
+summary:active,
+a[href]:active,
+input[type='submit']:active,
+input[type='button']:active,
+[role='button']:active,
+.press:active {
+  translate: 0 var(--press-drop);
+  transition-duration: var(--press-in);
+  transition-timing-function: var(--press-in-ease);
+}
+
+/*
+ * Disabled controls are not going anywhere. Guards against a future form
+ * button that greys itself out while submitting still bouncing when clicked.
+ */
+button:disabled:active,
+input:disabled:active,
+[aria-disabled='true']:active {
+  translate: none;
+}
+
+/* The press is motion for its own sake — hold everything still if asked. */
+@media (prefers-reduced-motion: reduce) {
+  button,
+  summary,
+  a[href],
+    input[type='submit'],
+  input[type='button'],
+  [role='button'],
+  .press {
+    transition: none;
+  }
+
+  button:active,
+  summary:active,
+  a[href]:active,
+    input[type='submit']:active,
+  input[type='button']:active,
+  [role='button']:active,
+  .press:active {
+    translate: none;
+  }
 }

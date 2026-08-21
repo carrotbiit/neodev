@@ -89,6 +89,11 @@
   }
 
   a {
+    /*
+     * Inline-block so the shared press can move it: `translate` has no effect
+     * on a non-replaced inline box, and these are otherwise plain inline links.
+     */
+    display: inline-block;
     font-family: var(--sans);
     font-weight: 700;
     font-size: var(--fs-nav);
@@ -360,6 +365,16 @@
     box-shadow:
       0 0 26px rgba(255, 106, 213, 0.95),
       0 0 90px rgba(255, 106, 213, 0.6);
+  }
+
+  /*
+   * Pressed. The travel down is the shared press in index.css; this only pulls
+   * the glow in behind it, so the button reads as sitting closer to the page.
+   */
+  &:active {
+    box-shadow:
+      0 0 10px rgba(255, 106, 213, 0.7),
+      0 0 34px rgba(255, 106, 213, 0.4);
   }
 
   @media (max-width: 720px) {
