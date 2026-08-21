@@ -3,6 +3,7 @@ import AboutSection from './components/AboutSection'
 import WaveTransition from './components/WaveTransition'
 import FaqSection from './components/FaqSection'
 import ContactSection from './components/ContactSection'
+import Scrollbar from './components/Scrollbar'
 import './App.css'
 
 /** Event details — swap these once the date and venue are locked in. */
@@ -90,6 +91,13 @@ function App() {
         <FaqSection />
         <ContactSection />
       </div>
+
+      {/*
+        Last, so it paints over everything. The page's only scrollbar — the
+        native one is hidden, because it cannot describe a page that holds a
+        whole section out of the document. See Scrollbar.jsx.
+      */}
+      <Scrollbar />
     </>
   )
 }

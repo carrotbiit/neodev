@@ -3,8 +3,8 @@ import './Faq.css'
 
 /**
  * FAQ, staged as a dive. The wave sweep above has already put the reader under
- * the water; from here the questions descend into the dark on a line, each one
- * a station further down than the last.
+ * the water; from here the questions descend into the dark, each one a station
+ * further down than the last.
  */
 
 /** Placeholder answers — swap once the real copy is written. */
@@ -149,7 +149,6 @@ export default function FaqSection() {
         <ol className="dive">
           {FAQS.map((faq) => (
             <li className="station" key={faq.q}>
-              <span className="station-mark" aria-hidden="true" />
               <details className="card">
                 <summary>
                   <span className="card-q">{faq.q}</span>

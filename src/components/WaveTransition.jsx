@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import waveUrl from '../assets/wave.png'
+import { clearDriver, notify, seekTo, setDriver, stopSeek } from '../scroll/pageScroll'
 import './WaveTransition.css'
 
 /**
@@ -132,13 +133,6 @@ export default function WaveTransition() {
     let lastY = window.scrollY
     let frame = 0
     let touchY = 0
-    /*
-     * Live while a nav link is driving the page. The catches below read raw
-     * scrolling as intent, and a link's scroll is not the reader reaching the
-     * end of anything — left alone, following one up past the beach would trip
-     * the reverse sweep and take the page off them mid-flight.
-     */
-    let navTimer = 0
 
     /* Measured on resize rather than per event — reading layout inside a
        scroll handler is what makes a page feel heavy. */
@@ -184,6 +178,9 @@ export default function WaveTransition() {
         '--reveal',
         `${Math.max(0, Math.min(width, width - edge))}px`,
       )
+      // The sweep is part of the page's one scroll axis, so the rail moves
+      // with it — this is the only place the wave's own position changes.
+      notify()
     }
 
     /** Take the depths out of flow so the page ends at the beach. */
@@ -289,6 +286,142 @@ export default function WaveTransition() {
       schedule()
     }
 
+    /* ------------------------------------------------- the one scroll axis */
+
+    /*
+     * The page as a scrollbar should see it: the beach, then the sweep, then
+     * the depths, laid end to end as one range that exists whatever the
+     * document is doing at the time.
+     *
+     * The browser's own range only ever covers one of those three — the depths
+     * are out of flow for the first two — which is why the native scrollbar
+     * reads the page as ending at the beach, and why it cannot be dragged
+     * across the wave. Everything below feeds `../scroll/pageScroll`, and the
+     * rail in Scrollbar.jsx drives the page back through `seek`.
+     */
+
+    /** Scrollable height of the depths once they are back in flow. */
+    const tail = () => Math.max(0, depths.offsetHeight - window.innerHeight)
+
+    /** Length of the sweep leg, in virtual pixels. */
+    const sweepLength = () => window.innerHeight * SWEEP
+
+    const virtualLength = () =>
+      Math.max(0, boundary()) + sweepLength() + tail()
+
+    const read = () => {
+      const beach = Math.max(0, boundary())
+      const sweep = sweepLength()
+
+      let position
+      // Mid-sweep. `current` rather than `target` — the rail should sit where
+      // the wave is drawn, not where the gesture has asked it to go.
+      if (engaged) position = beach + current * sweep
+      // On the beach, with the sweep not yet started.
+      else if (held) position = Math.min(window.scrollY, beach)
+      // Past the wave: ordinary scrolling through the depths.
+      else position = beach + sweep + Math.max(0, window.scrollY - seam)
+
+      return { position, length: virtualLength(), viewport: window.innerHeight }
+    }
+
+    /**
+     * Put the reader at `v` on that axis, immediately and without easing — a
+     * dragged thumb is the gesture, so there is nothing to smooth towards.
+     * Each leg has to leave the page in the state that leg assumes, which is
+     * what the two crossings below are for.
+     */
+    const seek = (v) => {
+      const beach = Math.max(0, boundary())
+      const sweep = sweepLength()
+      const at = Math.max(0, Math.min(virtualLength(), v))
+
+      // ------------------------------------------------------ in the depths
+      if (at >= beach + sweep) {
+        if (held) release()
+        engaged = false
+        stage.dataset.active = 'false'
+        target = 1
+        current = 1
+        window.scrollTo({ top: seam + (at - beach - sweep), behavior: 'instant' })
+        lastY = window.scrollY
+        return
+      }
+
+      // -------------------------------------------------------- on the beach
+      if (at <= beach) {
+        /*
+         * Coming back up out of the depths. Land on the seam before lifting
+         * them out of flow: from there, shortening the page cannot move the
+         * reader, so the beach comes back under them rather than jumping.
+         */
+        if (!held) {
+          window.scrollTo({ top: seam, behavior: 'instant' })
+          hold(0)
+        }
+        engaged = false
+        stage.dataset.active = 'false'
+        target = 0
+        current = 0
+        paint(0)
+        window.scrollTo({ top: at, behavior: 'instant' })
+        lastY = window.scrollY
+        return
+      }
+
+      // ------------------------------------------------------- in the sweep
+      const p = (at - beach) / sweep
+      if (!held) {
+        window.scrollTo({ top: seam, behavior: 'instant' })
+        hold(p)
+      }
+      /*
+       * Engaged before the scroll, not after: `onScroll` snaps an engaged wave
+       * back to `pinned`, and it must already know where that is by the time
+       * the event it is about to cause arrives.
+       */
+      engaged = true
+      pinned = boundary()
+      heading = p >= current ? 1 : -1
+      stage.dataset.active = 'true'
+      window.scrollTo({ top: pinned, behavior: 'instant' })
+      lastY = pinned
+      /*
+       * Both ends are held off by the branches above, so `p` is strictly
+       * inside the sweep and the loop's release/rewind checks cannot fire
+       * under the drag. Setting `target` and `current` together means the
+       * next frame has nothing to chase, and the wave sits exactly where the
+       * thumb was let go.
+       */
+      target = p
+      current = p
+      paint(p)
+      schedule()
+    }
+
+    /**
+     * Where on the axis `el` sits at the top of the screen. Works whichever
+     * side of the wave the reader is currently on, and whether or not the
+     * depths are held: offsets inside the depths are measured against the
+     * section itself, which is laid out the same either way.
+     */
+    const virtualTargetFor = (el) => {
+      const beach = Math.max(0, boundary())
+      const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0
+
+      if (depths.contains(el)) {
+        const within =
+          el.getBoundingClientRect().top -
+          depths.getBoundingClientRect().top -
+          margin
+        return beach + sweepLength() + Math.max(0, within)
+      }
+
+      // The beach is in flow at all times, so its own offsets are the real ones.
+      const y = el.getBoundingClientRect().top + window.scrollY - margin
+      return Math.max(0, Math.min(beach, y))
+    }
+
     /** True once the page has run out of beach to scroll. */
     const atEnd = () =>
       window.scrollY + window.innerHeight >=
@@ -301,15 +434,9 @@ export default function WaveTransition() {
     const drive = (delta) => {
       if (reduce.matches || !delta) return false
 
-      /*
-       * A nav link is still flying. Stand down rather than take the gesture:
-       * the browser cancels its own smooth scroll on real input, so the reader
-       * gets ordinary scrolling and the catches come back once it settles.
-       * Grabbing here instead would pin them mid-flight — a stray tick of
-       * inertia on the way up to the beach would engage the sweep in reverse
-       * and leave the questions stuck to the top of the screen.
-       */
-      if (navTimer) return false
+      // Real input outranks a nav link still in flight — drop the travel and
+      // hand the page straight back to the reader.
+      stopSeek()
 
       if (engaged) {
         advance(delta)
@@ -355,6 +482,9 @@ export default function WaveTransition() {
     const onKeyDown = (event) => {
       const step = KEYS[event.key]
       if (step === undefined) return
+      // A scroll key is the reader taking over, whether or not the wave is the
+      // thing that ends up handling it.
+      stopSeek()
       if (!engaged && !(step > 0 && held && atEnd())) return
       if (drive(step * window.innerHeight)) event.preventDefault()
     }
@@ -367,10 +497,13 @@ export default function WaveTransition() {
      * the reader where they were actually headed.
      */
     const jumpTo = () => {
-      if (!held) return
-      release()
-      const target = document.getElementById(location.hash.slice(1))
-      if (target) target.scrollIntoView({ behavior: 'instant', block: 'start' })
+      const el = document.getElementById(location.hash.slice(1))
+      if (!el) return
+      if (reduce.matches) {
+        el.scrollIntoView({ behavior: 'instant', block: 'start' })
+        return
+      }
+      seekTo(virtualTargetFor(el))
     }
 
     /**
@@ -392,32 +525,19 @@ export default function WaveTransition() {
       // well, and the two would fight over the same landing.
       history.pushState(null, '', `#${id}`)
 
-      if (held && depths.contains(el)) release()
-      markNavigating()
+      if (reduce.matches) {
+        el.scrollIntoView({ behavior: 'instant', block: 'start' })
+        return
+      }
 
-      const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0
-      let top = el.getBoundingClientRect().top + window.scrollY - margin
       /*
-       * Never land above the seam on the way to something below it. The
-       * heading's own scroll-margin would put the reader a little way back up
-       * the beach — which is where the reverse sweep waits, so the next flick
-       * of the wheel would pull them straight back out of the section they
-       * just asked for.
+       * Travel the page's own axis rather than the document's. A link to the
+       * FAQ from the beach is one continuous move that runs the wave on the
+       * way past, instead of cutting to the far side of it — and the rail
+       * tracks the whole journey, crossing included, because the axis is the
+       * same one it draws.
        */
-      if (depths.contains(el)) top = Math.max(seam, top)
-
-      window.scrollTo({ top, behavior: reduce.matches ? 'instant' : 'smooth' })
-    }
-
-    /** Holds off the catches until a nav link's scroll has come to rest. */
-    const markNavigating = () => {
-      clearTimeout(navTimer)
-      navTimer = setTimeout(() => {
-        navTimer = 0
-        lastY = window.scrollY
-        // Landing back above the beach's end re-arms the wave for the crossing.
-        arm()
-      }, 160)
+      seekTo(virtualTargetFor(el))
     }
 
     const onFocusIn = (event) => {
@@ -431,6 +551,10 @@ export default function WaveTransition() {
       const up = y < lastY - 1
       lastY = y
 
+      // Ordinary scrolling moves the rail too — the sweep's own frames are
+      // covered by `paint`.
+      notify()
+
       if (engaged) {
         /*
          * Downward the page cannot move while the depths are held — it ends at
@@ -441,13 +565,6 @@ export default function WaveTransition() {
           window.scrollTo({ top: pinned, behavior: 'instant' })
           lastY = pinned
         }
-        return
-      }
-
-      // A nav link owns this scroll and knows where it is going. Keep the
-      // timer alive for as long as it is still running.
-      if (navTimer) {
-        markNavigating()
         return
       }
 
@@ -475,6 +592,14 @@ export default function WaveTransition() {
 
     measure()
 
+    /*
+     * Only when the wave is actually running. Under reduced motion the section
+     * is never held and the page is an ordinary document, so leaving the
+     * driver unset lets the rail read the real scrollbar instead.
+     */
+    const driver = { read, seek }
+    if (!reduce.matches) setDriver(driver)
+
     // Hold from the start — unless the reader is already past the beach, or
     // has asked for less motion, in which case the page stays as written.
     if (!reduce.matches && window.scrollY <= boundary()) hold(0)
@@ -495,8 +620,9 @@ export default function WaveTransition() {
     depths.addEventListener('focusin', onFocusIn)
 
     return () => {
+      clearDriver(driver)
+      stopSeek()
       cancelAnimationFrame(frame)
-      clearTimeout(navTimer)
       observer.disconnect()
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('wheel', onWheel)
