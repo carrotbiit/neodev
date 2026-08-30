@@ -1,4 +1,5 @@
 import PalmTree from './PalmTree'
+import usePopIn from './usePopIn'
 import './About.css'
 
 /** Placeholder copy — swap once the real about text is written. */
@@ -25,6 +26,14 @@ const PHOTOS = [
 /** The strip along the bottom — wider, uncaptioned, VHS-timecoded. */
 const REEL = ['00:14', '01:02', '02:37', '03:48', '05:11']
 
+/*
+ * The tape runs itself, so the strip carries three identical copies of the
+ * reel and slides by exactly one of them before looping — the seam lands on
+ * a matching frame and never shows. Two would do at most widths; three keeps
+ * the track wider than the viewport on a very wide screen.
+ */
+const REEL_COPIES = [0, 1, 2]
+
 /** Menu titles on the brief window. Decorative — they do not open anything. */
 const MENUS = ['File', 'Edit', 'View', 'Help']
 
@@ -39,9 +48,12 @@ const STARS = Array.from({ length: 46 }, (_, i) => ({
   delay: (i % 7) * 0.6,
 }))
 
-function PhotoSlot({ area, ratio, code, caption }) {
+function PhotoSlot({ area, ratio, code, caption, order }) {
   return (
-    <figure className={`photo photo--${area}`} style={{ '--ratio': ratio }}>
+    <figure
+      className={`photo photo--${area} pop`}
+      style={{ '--ratio': ratio, '--pop-delay': `${order * 90}ms` }}
+    >
       <span className="photo-tape photo-tape--l" aria-hidden="true" />
       <span className="photo-tape photo-tape--r" aria-hidden="true" />
       <div className="photo-frame">
@@ -54,8 +66,10 @@ function PhotoSlot({ area, ratio, code, caption }) {
 }
 
 export default function AboutSection() {
+  const root = usePopIn()
+
   return (
-    <section id="about" aria-labelledby="about-title">
+    <section id="about" aria-labelledby="about-title" ref={root}>
       {/* ------------------------------------------------------- the scenery */}
       <div className="beach" aria-hidden="true">
         <div className="beach-sky">
@@ -104,12 +118,12 @@ export default function AboutSection() {
         </header>
 
         <div className="drift">
-          {PHOTOS.map((photo) => (
-            <PhotoSlot key={photo.area} {...photo} />
+          {PHOTOS.map((photo, i) => (
+            <PhotoSlot key={photo.area} order={i} {...photo} />
           ))}
 
           {/* A window off an old desktop: bevelled chrome, title bar, menu bar. */}
-          <article className="brief">
+          <article className="brief pop" style={{ '--pop-delay': '120ms' }}>
             <div className="window-bar">
               <span className="window-title">about.txt</span>
               <span className="window-buttons" aria-hidden="true">
@@ -132,7 +146,7 @@ export default function AboutSection() {
 
           <ul className="stats">
             {STATS.map((stat, i) => (
-              <li key={stat.label + i}>
+              <li key={stat.label + i} className="pop" style={{ '--pop-delay': `${i * 110}ms` }}>
                 <strong>{stat.value}</strong>
                 <span>{stat.label}</span>
               </li>
@@ -140,20 +154,26 @@ export default function AboutSection() {
           </ul>
         </div>
 
-        <div className="reel" role="group" aria-label="Image placeholders">
+        <div className="reel pop" role="group" aria-label="Image placeholders">
           <span className="reel-label" aria-hidden="true">
             ▶ TAPE 01
           </span>
-          <ul className="reel-track">
-            {REEL.map((code) => (
-              <li key={code}>
-                <div className="reel-slot">
-                  <span className="reel-code">{code}</span>
-                  <span className="photo-hint">IMAGE</span>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="reel-viewport">
+            <div className="reel-strip">
+              {REEL_COPIES.map((copy) => (
+                <ul className="reel-track" key={copy} aria-hidden={copy > 0 || undefined}>
+                  {REEL.map((code) => (
+                    <li key={code}>
+                      <div className="reel-slot">
+                        <span className="reel-code">{code}</span>
+                        <span className="photo-hint">IMAGE</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -521,9 +521,16 @@ export default function WaveTransition() {
       if (!el) return
 
       event.preventDefault()
-      // Straight to the URL: going through the hash would fire `jumpTo` as
-      // well, and the two would fight over the same landing.
-      history.pushState(null, '', `#${id}`)
+
+      /*
+       * The URL is left alone. These links are a way of scrolling the page,
+       * not of going anywhere: writing the hash makes the address bar read as
+       * though the reader has landed on a separate page, and puts an entry in
+       * the history so Back appears to leave the site when it only walks up a
+       * list of anchors. The one link in the masthead that really is a
+       * destination — Sponsor — carries no hash, so it is never seen here and
+       * navigates normally.
+       */
 
       if (reduce.matches) {
         el.scrollIntoView({ behavior: 'instant', block: 'start' })
@@ -619,10 +626,21 @@ export default function WaveTransition() {
     document.addEventListener('click', onNavClick)
     depths.addEventListener('focusin', onFocusIn)
 
+    /*
+     * Landing with a hash already in the URL — the sponsor page's nav links
+     * back here are `/#faq` and `/#contact`, and either can be bookmarked.
+     * The browser's own jump cannot serve those: the depths are held out of
+     * the document at this point, so it would aim at a section that is not in
+     * flow. One frame in, once the seam has been measured, ride there instead.
+     */
+    let landing = 0
+    if (location.hash) landing = requestAnimationFrame(jumpTo)
+
     return () => {
       clearDriver(driver)
       stopSeek()
       cancelAnimationFrame(frame)
+      cancelAnimationFrame(landing)
       observer.disconnect()
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('wheel', onWheel)

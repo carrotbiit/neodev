@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Sponsor — a separate document, not a section of the title screen.
+
+   Same palette and the same two faces, but a different register: this page is
+   read by people deciding whether to spend money, so it is a single measured
+   column on the site's own background, with the neon pulled back to the title
+   and prose set at a comfortable measure.
+
+   Type comes from the --fs-* steps only, --pixel for chrome and headings and
+   --sans for running prose — as everywhere else on the site.
+   ========================================================================== */
+
+.sponsor-page {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding-top: var(--masthead-h);
+  display: flex;
+  flex-direction: column;
+}
+
+.sponsor-main {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 72px) clamp(20px, 4vw, 48px) clamp(48px, 8vh, 96px);
+}
+
+/* ---------------------------------------------------------------- the lede */
+
+.sponsor-hero {
+  padding: clamp(28px, 5vh, 56px) 0;
+  text-align: left;
+}
+
+.sponsor-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+  /*
+   * The wordmark's neon, turned down. The title screen shouts; a page about
+   * budgets should be legible first and lit second.
+   */
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.55),
+    0 0 34px rgba(255, 106, 213, 0.6);
+}
+
+.sponsor-lede {
+  max-width: 62ch;
+  margin: 22px 0 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: var(--text);
+}

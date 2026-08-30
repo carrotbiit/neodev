@@ -15,6 +15,13 @@
   --sea-h: clamp(84px, 11vh, 150px);
   --wave-h: clamp(56px, 7vw, 110px);
 
+  /* Pop-in: how the windows and images arrive on screen. */
+  --pop-time: 260ms;
+  --pop-ease: linear;
+  /* One frame of tape per this long — the whole strip is five of them. */
+  --tape-step: 4.2s;
+  --reel-gap: clamp(12px, 1.6vw, 20px);
+
   --beach-ink: #2a0f47;
   --beach-line: rgba(255, 106, 213, 0.55);
   --cyan: #45e5ff;
@@ -580,6 +587,52 @@
   }
 }
 
+/* ------------------------------------------------------------ the pop-in
+
+   Every window and image in the section opens the way a window did on the
+   desktop this section is dressed as: a small rectangle at the centre grows
+   out to full size in a straight line and stops dead. So the growth is
+   `linear` and short — no easing curve, no overshoot, no settle, because the
+   machine drawing it had no time for any of that. It does not drift in from
+   anywhere either; a window opens where it is going to sit.
+
+   The one concession to it being paint rather than a wireframe: opacity snaps
+   on over the first sliver of the run instead of fading the whole way, so the
+   thing reads as drawn rather than dissolved in.
+
+   The growth lives on the standalone `scale` property — never inside
+   `transform` — because the polaroids already spend `transform` on their tilt
+   and their hover lift, and this has to compose with those rather than
+   overwrite them.
+
+   `usePopIn` adds `.is-in` the first time an element crosses into view, so
+   nothing pops twice and nothing pops while it is still below the fold. Until
+   then the element is laid out but not painted, which keeps the grid still.
+   -------------------------------------------------------------------------- */
+
+.pop {
+  opacity: 0;
+}
+
+.pop.is-in {
+  animation: pop-in var(--pop-time) var(--pop-ease) both;
+  animation-delay: var(--pop-delay, 0ms);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.3;
+  }
+  12% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
 /* ----------------------------------------------------------- the film reel */
 
 .reel {
@@ -628,17 +681,48 @@
   text-shadow: 0 0 10px rgba(69, 229, 255, 0.9);
 }
 
+/*
+ * The tape runs on its own, so there is nothing here for a reader to drag:
+ * the viewport clips, and no scrollbar is offered on any engine.
+ */
+.reel-viewport {
+  overflow: hidden;
+  padding: 8px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.reel-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-strip {
+  display: flex;
+  width: max-content;
+  /*
+   * Three identical copies of the reel, slid left by exactly one of them.
+   * The gap is carried as a right margin on every frame — the last one
+   * included — so a copy is a whole number of frame-plus-gap units and the
+   * loop seam falls on an identical frame.
+   */
+  animation: tape calc(var(--tape-step) * 5) linear infinite;
+}
+
+@keyframes tape {
+  to {
+    transform: translateX(calc(-100% / 3));
+  }
+}
+
 .reel-track {
   list-style: none;
   display: flex;
-  gap: clamp(12px, 1.6vw, 20px);
   margin: 0;
-  padding: 8px clamp(12px, 3vw, 32px);
-  overflow-x: auto;
-  scrollbar-width: thin;
+  padding: 0;
 
   li {
     flex: 0 0 clamp(170px, 21vw, 250px);
+    margin-right: var(--reel-gap);
   }
 }
 
@@ -702,7 +786,34 @@
   .star,
   .beach-ocean::after,
   .palm-fronds,
-  .palm-lean {
+  .palm-lean,
+  .pop.is-in {
     animation: none;
+  }
+
+  /* Nothing pops, so nothing may be left invisible. */
+  .pop {
+    opacity: 1;
+  }
+
+  /*
+   * The tape stands still, which means it can no longer bring the later
+   * frames past — hand the reader the scroll back, with one copy of the reel.
+   */
+  .reel-strip {
+    animation: none;
+  }
+
+  .reel-viewport {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .reel-viewport::-webkit-scrollbar {
+    display: initial;
+  }
+
+  .reel-track ~ .reel-track {
+    display: none;
   }
 }
