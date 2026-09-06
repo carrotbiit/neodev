@@ -346,7 +346,7 @@
 .photo {
   position: relative;
   margin: 0;
-  padding: 12px 12px 0;
+  padding: 12px 12px 14px;
   transform: rotate(var(--tilt));
   background: linear-gradient(180deg, #fff 0%, #ffdff4 100%);
   box-shadow:
@@ -393,14 +393,21 @@
   text-shadow: 0 0 12px rgba(255, 106, 213, 0.9);
 }
 
-.photo figcaption {
-  font-family: var(--pixel);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  text-align: center;
-  color: #4a1a63;
-  padding: 12px 4px 14px;
+/*
+ * A slot holding a real photograph drops the hatching behind it but keeps the
+ * dashed edge, so a filled print and an empty one are framed the same. The
+ * image is cropped to whatever ratio the slot was already holding, so filling
+ * one in moves nothing else in the collage.
+ */
+.photo-frame.is-filled {
+  background: none;
+}
+
+.photo-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Strips of tape holding each shot to the sand. */
@@ -491,7 +498,7 @@
   align-items: center;
   gap: 10px;
   padding: 6px 5px 6px 9px;
-  background: linear-gradient(90deg, #3c0f63 0%, #a12a8f 58%, #ff6ad5 100%);
+  background: #a12a8f;
   color: #fff;
 }
 
@@ -567,7 +574,6 @@
     gap: 10px;
     padding: 16px 0 16px 16px;
     border-left: 2px solid #ff6ad5;
-    box-shadow: -10px 0 26px -12px rgba(255, 106, 213, 0.9);
   }
 
   strong {

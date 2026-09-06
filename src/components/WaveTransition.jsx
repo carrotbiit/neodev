@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import waveUrl from '../assets/wave.png'
+import waveUrl from '../assets/wave.webp'
 import { clearDriver, notify, seekTo, setDriver, stopSeek } from '../scroll/pageScroll'
 import './WaveTransition.css'
 

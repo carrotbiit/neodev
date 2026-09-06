@@ -59,7 +59,7 @@ body {
    * and means the overlay and the section show the same pixels of it without
    * having to know anything about each other's position.
    */
-  --sea-image: url('./assets/underwaterbackground.png') center / cover fixed
+  --sea-image: url('./assets/underwaterbackground.webp') center / cover fixed
     no-repeat;
   /*
    * Dusk over the scene, deepening down the page. Stops are in px so they

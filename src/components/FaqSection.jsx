@@ -7,31 +7,22 @@ import './Faq.css'
  * further down than the last.
  */
 
-/** Placeholder answers — swap once the real copy is written. */
 const FAQS = [
   {
     q: 'Who can join?',
-    a: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    a: 'All students high school and below are welcome to participate!',
   },
   {
     q: 'What does it cost?',
-    a: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    a: 'Neodev is completely free! Breakfast, lunch, and dinner will be provided as well.',
   },
   {
     q: 'Do I need a team?',
-    a: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint.',
-  },
-  {
-    q: 'What should I build?',
-    a: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    a: "Teams are based on schools. You don't need a team to sign up!",
   },
   {
     q: 'What do I bring?',
-    a: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.',
-  },
-  {
-    q: 'How do I sign up?',
-    a: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.',
+    a: 'Participants must bring a laptop or device to work on. Chargers are also recommended.',
   },
 ]
 

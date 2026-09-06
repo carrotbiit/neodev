@@ -22,6 +22,8 @@ function App() {
         speed={0.9}
         horizon={0.58}
         sunSize={0.3}
+        /* The beach and everything under it paint over this. */
+        visibleWhile=".screen"
       />
 
       <Masthead />

@@ -4,7 +4,7 @@
    The wave sweep above hands the reader over already underwater, so this
    section opens straight into the sea. The questions run straight down one
    column while the water darkens toward the seabed. Its palette is sampled
-   from wave.png so the sea reads as the same water the wave was.
+   from wave.webp so the sea reads as the same water the wave was.
 
    Type: steps come from the scale in index.css. --pixel is display type and UI
    chrome, --sans is running prose. Nothing else.
@@ -20,6 +20,14 @@
   overflow: hidden;
   text-align: left;
   padding: clamp(60px, 12vh, 140px) 0 0;
+  /*
+   * A screenful at least. With a short list of questions the column no longer
+   * fills the viewport on its own, and the sweep hands the reader over into
+   * this section — arriving to see its bottom edge and the seabed already on
+   * screen would undo the sense of having gone under.
+   */
+  box-sizing: border-box;
+  min-height: 100svh;
   /* Land clear of the pinned masthead when the nav link jumps here. */
   scroll-margin-top: 76px;
 

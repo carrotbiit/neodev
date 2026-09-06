@@ -1,3 +1,5 @@
+import photoOne from '../assets/2024/2024-3.jpg'
+import photoFour from '../assets/2024/2024-4.jpg'
 import PalmTree from './PalmTree'
 import usePopIn from './usePopIn'
 import './About.css'
@@ -8,19 +10,23 @@ const BRIEF = [
   'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
 ]
 
-/** Placeholder stat tiles — numbers are stand-ins. */
+/** The three figures the front page leads with. */
 const STATS = [
-  { value: '00', label: 'Placeholder' },
-  { value: '00', label: 'Placeholder' },
-  { value: '00', label: 'Placeholder' },
+  { value: '$1000+', label: 'In prizes' },
+  { value: '80+', label: 'Participants' },
+  { value: '14', label: 'Hours' },
 ]
 
-/** The scattered polaroids. `area` maps to a grid slot in About.css. */
+/*
+ * The scattered polaroids. `area` maps to a grid slot in About.css. A slot
+ * with a `src` shows that photograph cropped to the slot's ratio; one without
+ * is still an empty frame waiting for a picture.
+ */
 const PHOTOS = [
-  { area: 'one', ratio: '4 / 3', code: 'IMG_01', caption: 'Placeholder' },
-  { area: 'two', ratio: '1 / 1', code: 'IMG_02', caption: 'Placeholder' },
-  { area: 'three', ratio: '3 / 4', code: 'IMG_03', caption: 'Placeholder' },
-  { area: 'four', ratio: '16 / 9', code: 'IMG_04', caption: 'Placeholder' },
+  { area: 'one', ratio: '4 / 3', src: photoOne, alt: 'Neodev 2024' },
+  { area: 'two', ratio: '1 / 1', code: 'IMG_02' },
+  { area: 'three', ratio: '3 / 4', code: 'IMG_03' },
+  { area: 'four', ratio: '16 / 9', src: photoFour, alt: 'Neodev 2024' },
 ]
 
 /** The strip along the bottom — wider, uncaptioned, VHS-timecoded. */
@@ -48,7 +54,7 @@ const STARS = Array.from({ length: 46 }, (_, i) => ({
   delay: (i % 7) * 0.6,
 }))
 
-function PhotoSlot({ area, ratio, code, caption, order }) {
+function PhotoSlot({ area, ratio, src, alt, code, order }) {
   return (
     <figure
       className={`photo photo--${area} pop`}
@@ -56,11 +62,16 @@ function PhotoSlot({ area, ratio, code, caption, order }) {
     >
       <span className="photo-tape photo-tape--l" aria-hidden="true" />
       <span className="photo-tape photo-tape--r" aria-hidden="true" />
-      <div className="photo-frame">
-        <span className="photo-code">{code}</span>
-        <span className="photo-hint">IMAGE</span>
+      <div className={`photo-frame${src ? ' is-filled' : ''}`}>
+        {src ? (
+          <img src={src} alt={alt} loading="lazy" decoding="async" />
+        ) : (
+          <>
+            <span className="photo-code">{code}</span>
+            <span className="photo-hint">IMAGE</span>
+          </>
+        )}
       </div>
-      <figcaption>{caption}</figcaption>
     </figure>
   )
 }

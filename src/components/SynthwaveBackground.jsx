@@ -8,7 +8,12 @@ import { useEffect, useRef } from 'react'
  * it stays cheap regardless of how many grid lines are on screen.
  */
 
-const DEFAULT_COLORS = {
+/*
+ * Exported so a page that wants one piece of this scene can have it without
+ * running the whole canvas — the sponsor page paints just the sun with
+ * `renderSun` and these colours.
+ */
+export const DEFAULT_COLORS = {
   /** Sky gradient, top of the canvas down to the horizon. */
   skyTop: '#1b0b38',
   skyBottom: '#2d1055',
@@ -80,6 +85,39 @@ const MOUNTAINS = {
   amplitude: 1.5,
   /** How many columns the slope takes to climb from the roadside to full height. */
   ramp: 3,
+}
+
+/*
+ * Ridge heights, cached by side and ridge index.
+ *
+ * Every ridge is pinned to a fixed world depth, so the terrain under it never
+ * changes — but the mesh is 26 columns across, 52 rows deep and mirrored, so
+ * recomputing it each frame is ~2,700 three-octave noise lookups per frame for
+ * an answer that was the same last frame. Each ridge is sampled once, the
+ * first time it appears at the back, and thrown away once it has passed the
+ * camera. Same numbers, same mountains — just not computed 60 times a second.
+ */
+const ridgeCache = new Map()
+
+function ridgeHeights(side, index, worldZ, columnAt) {
+  const key = index * 2 + (side > 0 ? 1 : 0)
+  let heights = ridgeCache.get(key)
+  if (heights) return heights
+
+  heights = new Float64Array(MOUNTAINS.columns)
+  for (let j = 0; j < MOUNTAINS.columns; j++) {
+    heights[j] = terrainHeight(columnAt(j), worldZ)
+  }
+  ridgeCache.set(key, heights)
+  return heights
+}
+
+/** Drops ridges the camera has already passed — they never come back. */
+function pruneRidges(first) {
+  if (ridgeCache.size <= MOUNTAINS.rows * 4) return
+  for (const key of ridgeCache.keys()) {
+    if (key >> 1 < first) ridgeCache.delete(key)
+  }
 }
 
 /** Deterministic hash in [0, 1) — stands in for a seeded random table. */
@@ -167,6 +205,9 @@ function drawMountains(ctx, view) {
   }
 
   for (const side of [-1, 1]) {
+    /** World x of column `j` on this side of the road. */
+    const columnAt = (j) => side * (inner + (outer - inner) * (j / (columns - 1)))
+
     // Built back to front, so the painter's pass below can walk it in order.
     const grid = []
     for (let i = rows - 1; i >= 0; i--) {
@@ -179,12 +220,11 @@ function drawMountains(ctx, view) {
         fog: Math.min(1, Math.max(0, (far - z) / (far - 2))),
         points: [],
       }
+      const heights = ridgeHeights(side, index, worldZ, columnAt)
       for (let j = 0; j < columns; j++) {
-        const xw = side * (inner + (outer - inner) * (j / (columns - 1)))
-        const h = terrainHeight(xw, worldZ)
         row.points.push({
-          x: cx + xw * columnGap * scale,
-          y: horizonY + K * (1 - h) * scale,
+          x: cx + columnAt(j) * columnGap * scale,
+          y: horizonY + K * (1 - heights[j]) * scale,
         })
       }
       grid.push(row)
@@ -248,13 +288,14 @@ function drawMountains(ctx, view) {
 
   ctx.globalAlpha = 1
   ctx.restore()
+  pruneRidges(first)
 }
 
 /**
  * Paints the sun once onto an offscreen canvas. The sun never moves, so this
  * only re-runs on resize or when the colors change.
  */
-function renderSun(radius, colors, dpr) {
+export function renderSun(radius, colors, dpr) {
   const rim = radius * 1.05
   const size = Math.ceil(rim * 2)
   const canvas = document.createElement('canvas')
@@ -321,6 +362,14 @@ export default function SynthwaveBackground({
   lineWidth = DEFAULTS.lineWidth,
   /** Neon bloom strength, 0 disables it. */
   glow = DEFAULTS.glow,
+  /**
+   * Selector for the element this canvas is the background of. The canvas is
+   * fixed to the viewport, so it is never off screen itself — but once the
+   * page has scrolled past this element the sections below paint over it and
+   * nothing it draws can be seen. While that is true the loop stops entirely
+   * rather than animating a hidden scene. Omit it and the canvas always runs.
+   */
+  visibleWhile,
   className,
   style,
   ...rest
@@ -337,6 +386,7 @@ export default function SynthwaveBackground({
     sunSize,
     lineWidth,
     glow,
+    visibleWhile,
   }
 
   useEffect(() => {
@@ -372,7 +422,12 @@ export default function SynthwaveBackground({
     }
 
     const draw = (now) => {
-      frame = requestAnimationFrame(draw)
+      /*
+       * Under reduced motion nothing on the canvas moves, so one frame is the
+       * whole animation — it is repainted on resize instead of 60 times a
+       * second. `run` puts the loop back if the setting changes.
+       */
+      frame = reduceMotion.matches ? 0 : requestAnimationFrame(draw)
 
       const p = propsRef.current
       const c = p.colors
@@ -515,14 +570,73 @@ export default function SynthwaveBackground({
       }
     }
 
+    /*
+     * The loop only runs while the scene can actually be seen. Starting resets
+     * the clock, so no time accumulates while it is stopped and the floor
+     * picks up exactly where it left off rather than jumping forward by however
+     * long the reader spent further down the page.
+     */
+    let running = false
+
+    const run = () => {
+      if (running) return
+      running = true
+      last = performance.now()
+      frame = requestAnimationFrame(draw)
+    }
+
+    const halt = () => {
+      running = false
+      cancelAnimationFrame(frame)
+      frame = 0
+    }
+
+    /* A resize is a repaint even when the loop is stopped. */
+    const onResize = () => {
+      resize()
+      if (!running || !frame) draw(performance.now())
+    }
+
     resize()
-    const observer = new ResizeObserver(resize)
+    const observer = new ResizeObserver(onResize)
     observer.observe(container)
-    frame = requestAnimationFrame(draw)
+
+    /*
+     * Nothing this canvas paints is visible once the page has scrolled past
+     * the section it sits behind — the sections below it are opaque — so the
+     * loop stops there and starts again on the way back up.
+     */
+    const watched =
+      propsRef.current.visibleWhile &&
+      document.querySelector(propsRef.current.visibleWhile)
+
+    const seen = watched
+      ? new IntersectionObserver(
+          ([entry]) => (entry.isIntersecting ? run() : halt()),
+          /* Generous margin: back on well before any of it can be seen. */
+          { rootMargin: '250px' },
+        )
+      : null
+
+    if (seen) seen.observe(watched)
+    else run()
+
+    /* Reduced motion is a setting, not a constant — pick the loop back up. */
+    const onMotionChange = () => {
+      if (!reduceMotion.matches && running && !frame) {
+        last = performance.now()
+        frame = requestAnimationFrame(draw)
+      } else {
+        draw(performance.now())
+      }
+    }
+    reduceMotion.addEventListener('change', onMotionChange)
 
     return () => {
-      cancelAnimationFrame(frame)
+      halt()
       observer.disconnect()
+      seen?.disconnect()
+      reduceMotion.removeEventListener('change', onMotionChange)
     }
   }, [])
 
