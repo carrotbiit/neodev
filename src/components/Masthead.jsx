@@ -19,9 +19,13 @@ const SPONSOR = { label: 'Sponsor', href: '/sponsor.html' }
 const HOME = '/'
 
 const SOCIALS = [
-  { label: 'Instagram', href: 'https://instagram.com/', icon: 'instagram-icon' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/', icon: 'linkedin-icon' },
-  { label: 'Discord', href: 'https://discord.com/', icon: 'discord-icon' },
+  { label: 'Instagram', href: 'https://www.instagram.com/neodevleague/', icon: 'instagram-icon' },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/company/neo-developer-leagues',
+    icon: 'linkedin-icon',
+  },
+  { label: 'Discord', href: 'https://discord.gg/fvs3nGFhV', icon: 'discord-icon' },
 ]
 
 /**
