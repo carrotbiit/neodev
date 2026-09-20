@@ -414,11 +414,13 @@
 }
 
 /*
- * A real `<a href>`, so the shared press rule in index.css already moves it —
- * `inline-flex` both puts the glyph beside the words and gives `translate`
- * a box to move, which a plain inline box would not.
+ * Both of the page's buttons: the way back at the foot, and the address above
+ * it. Real `<a href>`s, so the shared press rule in index.css already moves
+ * them — `inline-flex` both puts a glyph beside the words and gives
+ * `translate` a box to move, which a plain inline box would not.
  */
-.sponsor-home {
+.sponsor-home,
+.sponsor-mail {
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -443,6 +445,42 @@
   height: 16px;
   /* Sprite symbols ship dark; force them white, as the masthead's icons are. */
   filter: brightness(0) invert(1);
+}
+
+/* ----------------------------------------------------------- get in touch
+
+   The page spends itself explaining what a sponsor gets; this is where they
+   act on it. The address is set in the same bordered button as the way back,
+   but lit in the accent rather than drawn in white, because between the two
+   of them this is the one worth pressing.
+   -------------------------------------------------------------------------- */
+
+.sponsor-contact-lede {
+  max-width: 62ch;
+  margin: 0 0 clamp(22px, 3.4vh, 34px);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.sponsor-mail {
+  /* An address is one unbroken token — let it wrap rather than overflow. */
+  overflow-wrap: anywhere;
+  /*
+   * Everything else on this page is set in caps, but an address is a literal
+   * string rather than a label: the local part of one is case-sensitive, so
+   * printing it upper-cased hands anyone who retypes it a different address.
+   */
+  text-transform: none;
+  border-color: var(--accent);
+  color: var(--accent);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--text-h);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+  }
 }
 
 /* ------------------------------------------------------------------ narrow */
