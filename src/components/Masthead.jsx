@@ -12,8 +12,13 @@ const NAV = [
   { label: 'Contact', href: '#contact' },
 ]
 
-/** The sponsor page is a separate document, not a section — hence no hash. */
-const SPONSOR = { label: 'Sponsor', href: '/sponsor.html' }
+/**
+ * The sponsor page is a separate document, not a section — hence no hash.
+ *
+ * Extensionless: `cleanUrls` in vercel.json serves sponsor.html here, and
+ * sends anyone arriving on the old `/sponsor.html` to this address.
+ */
+const SPONSOR = { label: 'Sponsor', href: '/sponsor' }
 
 /** The title screen, for the section links to be relative to. */
 const HOME = '/'

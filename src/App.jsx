@@ -23,7 +23,7 @@ const EVENT = {
  * No hash, deliberately: `onNavClick` only intercepts `a[href^="#"]`, so this
  * is left alone and navigates like any other link.
  */
-const SPONSOR_HREF = '/sponsor.html'
+const SPONSOR_HREF = '/sponsor'
 
 function App() {
   return (
