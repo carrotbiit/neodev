@@ -230,7 +230,17 @@ export default function SponsorPage() {
               any of them.
             </p>
 
-            <a className="sponsor-mail" href={`mailto:${CONTACT_EMAIL}`}>
+            {/*
+              Opened in a new tab so the sponsor keeps the page they were
+              reading: a `mailto:` with no handler registered otherwise takes
+              the current tab with it and leaves them nowhere.
+            */}
+            <a
+              className="sponsor-mail"
+              href={`mailto:${CONTACT_EMAIL}`}
+              target="_blank"
+              rel="noreferrer"
+            >
               {CONTACT_EMAIL}
             </a>
           </section>
