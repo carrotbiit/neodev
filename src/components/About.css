@@ -22,13 +22,6 @@
   --beach-ink: #2a0f47;
   --beach-line: rgba(255, 106, 213, 0.55);
   --cyan: #45e5ff;
-  /*
-   * The window's titles are blue. Two steps of the same hue, because they sit
-   * on opposite backgrounds: --cyan lit on the magenta title bar, and this
-   * darker one as ink on the pale --chrome menu bar, where --cyan would come
-   * out at about 1.5:1 and vanish.
-   */
-  --title-blue: #2c3f9e;
 
   position: relative;
   isolation: isolate;
@@ -574,8 +567,6 @@
 
 .window-title {
   text-transform: uppercase;
-  color: var(--cyan);
-  text-shadow: 0 0 8px rgba(69, 229, 255, 0.55);
 }
 
 .window-buttons {
@@ -602,7 +593,6 @@
   gap: 16px;
   padding: 8px 10px;
   border-bottom: 1px solid var(--chrome-dark);
-  color: var(--title-blue);
 }
 
 /* The text area: sunken, and printed on paper rather than neon. */
