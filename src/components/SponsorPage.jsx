@@ -21,6 +21,9 @@ import './Sponsor.css'
 const LEDE =
   'Big teams, school versus school. Neodev places a focus on collaboration and team dynamics, not just who can crank out the most code. Support brilliant and innovative high schoolers in this 14 hour long hackathon.'
 
+/** Where a sponsor writes to. The same address the title screen's contact lists. */
+const CONTACT_EMAIL = 'support@neoleague.dev'
+
 /*
  * The tiers, cheapest first. `perks` is only what that tier adds — each one
  * also carries everything below it, which the card states in its own words
@@ -222,6 +225,32 @@ export default function SponsorPage() {
           {YEARS.map((entry, i) => (
             <Year key={entry.year} {...entry} flip={i % 2 === 0} />
           ))}
+
+          {/* --------------------------------------------- the way to say yes */}
+          <section className="sponsor-band" aria-labelledby="sponsor-contact-title">
+            <h2 className="sponsor-h2" id="sponsor-contact-title">
+              Get in touch
+            </h2>
+
+            <p className="sponsor-contact-lede">
+              Write to us with the tier you have in mind, or with questions about
+              any of them.
+            </p>
+
+            {/*
+              Opened in a new tab so the sponsor keeps the page they were
+              reading: a `mailto:` with no handler registered otherwise takes
+              the current tab with it and leaves them nowhere.
+            */}
+            <a
+              className="sponsor-mail"
+              href={`mailto:${CONTACT_EMAIL}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {CONTACT_EMAIL}
+            </a>
+          </section>
 
           {/*
            * The way back. The masthead's links all point into the title

@@ -2,7 +2,7 @@
    Contact — the cut-away.
 
    The ground under the seabed the dive ends on, left bare: a survey grid over
-   the face and nothing else on it.
+   the face, and a terminal on it listing the ways back up to the surface.
 
    Type: steps come from the scale in index.css. --pixel is display type and UI
    chrome, --sans is running prose. Nothing else.
@@ -153,22 +153,21 @@
   }
 }
 
-.geode-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(12px, 1.8vw, 20px);
+/*
+ * The panel inside the terminal, sunk into it — the mirror of the window's
+ * raised bevel.
+ */
+.roster {
   margin: 6px 4px 4px;
   padding: clamp(18px, 2.6vw, 30px);
   background: var(--paper);
-  /* Sunken bevel — the mirror of the window's raised one. */
   box-shadow:
     inset 2px 2px 0 var(--chrome-dark),
     inset -2px -2px 0 var(--chrome-lit);
 }
 
-.geode-lead {
-  grid-column: 1 / -1;
-  margin: 0;
+.roster-lead {
+  margin: 0 0 clamp(18px, 2.6vw, 28px);
   font-family: var(--pixel);
   font-size: var(--fs-label);
   line-height: 1.7;
@@ -177,12 +176,25 @@
   color: var(--paper-ink);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
+.roster-list {
+  display: grid;
+  gap: clamp(14px, 2vw, 20px);
+  margin: 0;
+}
 
-  span {
+/*
+ * One row per contact: the label in chrome type, the address beside it. The
+ * label column is sized to the longest of them and then holds still, so the
+ * addresses line up with each other rather than each starting wherever its
+ * own label happened to end.
+ */
+.roster-row {
+  display: grid;
+  grid-template-columns: minmax(96px, max-content) 1fr;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 22px);
+
+  dt {
     font-family: var(--pixel);
     font-size: var(--fs-micro);
     letter-spacing: 0.2em;
@@ -190,79 +202,41 @@
     color: var(--paper-ink);
   }
 
-  input,
-  textarea {
-    font-family: var(--sans);
-    font-size: var(--fs-body);
-    color: var(--paper-ink);
-    background: #fff;
-    border: 0;
-    border-radius: 0;
-    padding: 11px 13px;
-    resize: vertical;
-    /* Sunk into the panel, the way fields were. */
-    box-shadow:
-      inset 2px 2px 0 var(--chrome-dark),
-      inset -2px -2px 0 var(--chrome-lit);
-
-    &:focus {
-      outline: 2px solid var(--ore);
-      outline-offset: -2px;
-    }
+  dd {
+    margin: 0;
+    /* An address is one unbroken token — let it wrap rather than overflow. */
+    overflow-wrap: anywhere;
   }
 }
 
-.field--wide {
-  grid-column: 1 / -1;
-}
+.roster-row a {
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  color: var(--paper-ink);
+  /* Offset so the rule clears the descenders rather than cutting them. */
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--paper-ink) 40%, transparent);
+  text-underline-offset: 3px;
 
-.geode-send {
-  grid-column: 1 / -1;
-  justify-self: start;
-  margin-top: 2px;
-  padding: 14px 32px;
-  font-family: var(--pixel);
-  font-size: var(--fs-button);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--chrome-ink);
-  cursor: pointer;
-  border: 0;
-  background: var(--chrome);
-  box-shadow:
-    inset 2px 2px 0 var(--chrome-lit),
-    inset -2px -2px 0 var(--chrome-dark);
-
-  /* Hover strikes the vein: the ore colours in order, top to bottom. */
   &:hover,
   &:focus-visible {
-    color: #fff;
-    background: linear-gradient(
-      180deg,
-      #ffd166 0%,
-      #ff9f45 30%,
-      #ff6ad5 65%,
-      #c13bd6 100%
-    );
+    /* Strikes the vein, the same gold the title is lit in. */
+    color: #8a5a00;
+    text-decoration-color: currentColor;
   }
 
-  /* And goes in when pressed, because that is what these did. */
-  &:active {
-    box-shadow:
-      inset 2px 2px 0 var(--chrome-dark),
-      inset -2px -2px 0 var(--chrome-lit);
+  &:focus-visible {
+    outline: 2px solid var(--ore);
+    outline-offset: 3px;
   }
 }
 
 /* ------------------------------------------------------------------ mobile */
 
-@media (max-width: 780px) {
-  .geode-form {
+@media (max-width: 480px) {
+  /* Too narrow for a label column — stack each address under its label. */
+  .roster-row {
     grid-template-columns: 1fr;
-  }
-
-  .geode-send {
-    justify-self: stretch;
-    text-align: center;
+    gap: 5px;
   }
 }

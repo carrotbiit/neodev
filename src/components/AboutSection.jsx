@@ -31,17 +31,6 @@ const PHOTOS = [
   { area: 'four', ratio: '16 / 9', src: photoFour, alt: 'Neodev 2024' },
 ]
 
-/** The strip along the bottom — wider, uncaptioned, VHS-timecoded. */
-const REEL = ['00:14', '01:02', '02:37', '03:48', '05:11']
-
-/*
- * The tape runs itself, so the strip carries three identical copies of the
- * reel and slides by exactly one of them before looping — the seam lands on
- * a matching frame and never shows. Two would do at most widths; three keeps
- * the track wider than the viewport on a very wide screen.
- */
-const REEL_COPIES = [0, 1, 2]
-
 /** Menu titles on the brief window. Decorative — they do not open anything. */
 const MENUS = ['File', 'Edit', 'View', 'Help']
 
@@ -165,28 +154,6 @@ export default function AboutSection() {
               </li>
             ))}
           </ul>
-        </div>
-
-        <div className="reel pop" role="group" aria-label="Image placeholders">
-          <span className="reel-label" aria-hidden="true">
-            ▶ TAPE 01
-          </span>
-          <div className="reel-viewport">
-            <div className="reel-strip">
-              {REEL_COPIES.map((copy) => (
-                <ul className="reel-track" key={copy} aria-hidden={copy > 0 || undefined}>
-                  {REEL.map((code) => (
-                    <li key={code}>
-                      <div className="reel-slot">
-                        <span className="reel-code">{code}</span>
-                        <span className="photo-hint">IMAGE</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>

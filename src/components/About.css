@@ -18,9 +18,6 @@
   /* Pop-in: how the windows and images arrive on screen. */
   --pop-time: 260ms;
   --pop-ease: linear;
-  /* One frame of tape per this long — the whole strip is five of them. */
-  --tape-step: 4.2s;
-  --reel-gap: clamp(12px, 1.6vw, 20px);
 
   --beach-ink: #2a0f47;
   --beach-line: rgba(255, 106, 213, 0.55);
@@ -435,8 +432,7 @@
   background: repeating-linear-gradient(45deg, #2a0f47 0 10px, #351351 10px 20px);
 }
 
-.photo-code,
-.reel-code {
+.photo-code {
   position: absolute;
   top: 8px;
   left: 10px;
@@ -706,138 +702,6 @@
   }
 }
 
-/* ----------------------------------------------------------- the film reel */
-
-.reel {
-  position: relative;
-  margin-top: clamp(52px, 9vh, 110px);
-  padding: 24px 0;
-  background: rgba(14, 4, 30, 0.55);
-  border-top: 1px solid rgba(69, 229, 255, 0.45);
-  border-bottom: 1px solid rgba(69, 229, 255, 0.45);
-}
-
-/* Sprocket holes, top and bottom. */
-.reel::before,
-.reel::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 12px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.5) 0 10px,
-    rgba(255, 255, 255, 0) 10px 28px
-  );
-  opacity: 0.4;
-}
-
-.reel::before {
-  top: 4px;
-}
-
-.reel::after {
-  bottom: 4px;
-}
-
-.reel-label {
-  position: absolute;
-  top: -9px;
-  left: clamp(12px, 3vw, 32px);
-  padding: 0 10px;
-  background: #1b0b38;
-  font-family: var(--pixel);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.2em;
-  color: var(--cyan);
-  text-shadow: 0 0 10px rgba(69, 229, 255, 0.9);
-}
-
-/*
- * The tape runs on its own, so there is nothing here for a reader to drag:
- * the viewport clips, and no scrollbar is offered on any engine.
- */
-.reel-viewport {
-  overflow: hidden;
-  padding: 8px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.reel-viewport::-webkit-scrollbar {
-  display: none;
-}
-
-.reel-strip {
-  display: flex;
-  width: max-content;
-  /*
-   * Three identical copies of the reel, slid left by exactly one of them.
-   * The gap is carried as a right margin on every frame — the last one
-   * included — so a copy is a whole number of frame-plus-gap units and the
-   * loop seam falls on an identical frame.
-   */
-  animation: tape calc(var(--tape-step) * 5) linear infinite;
-}
-
-@keyframes tape {
-  to {
-    transform: translateX(calc(-100% / 3));
-  }
-}
-
-.reel-track {
-  list-style: none;
-  display: flex;
-  margin: 0;
-  padding: 0;
-
-  li {
-    flex: 0 0 clamp(170px, 21vw, 250px);
-    margin-right: var(--reel-gap);
-  }
-}
-
-.reel-slot {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 9;
-  border: 2px dashed rgba(69, 229, 255, 0.6);
-  background: repeating-linear-gradient(45deg, #2a0f47 0 10px, #351351 10px 20px);
-  transition: border-color 0.25s ease;
-
-  &:hover {
-    border-color: #ff6ad5;
-  }
-
-  &:hover::after {
-    opacity: 1;
-  }
-}
-
-/*
- * The hover glow, faded rather than grown, for the same reason as the prints
- * above — and here it matters more than it looks: these sit inside `.reel-strip`,
- * which the tape animation has handed to the compositor as one very wide layer.
- * Repainting a box-shadow on any slot inside it means repainting that whole
- * layer, mid-animation, for a quarter of a second.
- *
- * Absolutely positioned, so it is not a grid item and `place-items: center`
- * goes on centring the code and the hint. Pulled out by the border so it casts
- * from the slot's edge.
- */
-.reel-slot::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  pointer-events: none;
-  opacity: 0;
-  box-shadow: 0 0 26px rgba(255, 106, 213, 0.55);
-  transition: opacity 0.25s ease;
-}
-
 /* ------------------------------------------------------------------ mobile */
 
 @media (max-width: 980px) {
@@ -889,26 +753,5 @@
   /* Nothing pops, so nothing may be left invisible. */
   .pop {
     opacity: 1;
-  }
-
-  /*
-   * The tape stands still, which means it can no longer bring the later
-   * frames past — hand the reader the scroll back, with one copy of the reel.
-   */
-  .reel-strip {
-    animation: none;
-  }
-
-  .reel-viewport {
-    overflow-x: auto;
-    scrollbar-width: thin;
-  }
-
-  .reel-viewport::-webkit-scrollbar {
-    display: initial;
-  }
-
-  .reel-track ~ .reel-track {
-    display: none;
   }
 }
