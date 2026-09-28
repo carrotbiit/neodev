@@ -80,6 +80,18 @@
   text-align: left;
 }
 
+/*
+ * The long logo over the title. Decorative — the heading beneath it already
+ * says "Neodev" — so it carries an empty alt. Width and height on the tag
+ * reserve its box before it loads.
+ */
+.sponsor-logo {
+  display: block;
+  width: min(360px, 100%);
+  height: auto;
+  margin: 0 0 18px;
+}
+
 .sponsor-title {
   font-family: var(--pixel);
   font-weight: 400;

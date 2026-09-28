@@ -166,6 +166,13 @@ export default function SponsorPage() {
           {/* Pitch on the left, photograph on the right. */}
           <header className="sponsor-hero">
             <div className="sponsor-hero-copy">
+              <img
+                className="sponsor-logo"
+                src="/logo-long.png"
+                alt=""
+                width="1220"
+                height="407"
+              />
               <h1 className="sponsor-title">Sponsor Neodev</h1>
               <p className="sponsor-lede">{LEDE}</p>
             </div>
