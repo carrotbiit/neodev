@@ -60,6 +60,13 @@ const JOBS = [
    * crop at this width has ten pixels of headroom and no more.
    */
   ['2024/2024-5.jpg', '2024/2024-5.webp', 1320, 4 / 3],
+  /*
+   * The cursor mascot — not a photograph, but cut the same way. Its master is
+   * the 1024px logo in `public/`, and `.mascot-fob` paints it at a fixed 56px
+   * square, so 112. The only master here with transparency, which is why the
+   * pixel format below is chosen per file rather than left to ffmpeg.
+   */
+  ['../../public/logo.png', 'mascot.webp', 112, 1],
 ]
 
 const run = (args) =>
@@ -84,7 +91,10 @@ for (const [from, to, width, ratio] of JOBS) {
 
   await run([
     '-i', master,
-    '-vf', `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
+    '-vf',
+    `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}` +
+      /* Keep the alpha channel of a PNG; a JPEG has none to keep. */
+      (from.endsWith('.png') ? ',format=yuva420p' : ''),
     '-c:v', 'libwebp',
     '-quality', '82',
     '-frames:v', '1',

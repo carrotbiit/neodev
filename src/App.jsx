@@ -5,11 +5,12 @@ import FaqSection from './components/FaqSection'
 import ContactSection from './components/ContactSection'
 import Scrollbar from './components/Scrollbar'
 import Masthead from './components/Masthead'
+import CursorMascot from './components/CursorMascot'
 import './App.css'
 
 /** Event details — swap these once the venue is locked in. */
 const EVENT = {
-  date: 'November',
+  date: 'December',
   year: '2026',
 }
 
@@ -73,6 +74,9 @@ function App() {
         whole section out of the document. See Scrollbar.jsx.
       */}
       <Scrollbar />
+
+      {/* The logo on a keyring, hung off the pointer. Over the rail too. */}
+      <CursorMascot />
     </>
   )
 }

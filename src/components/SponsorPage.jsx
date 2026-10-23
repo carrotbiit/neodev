@@ -5,6 +5,7 @@ import shot2025a from '../assets/2025/2025-3.webp'
 import shot2025b from '../assets/2025/2025-4.webp'
 import Masthead from './Masthead'
 import SunBackdrop from './SunBackdrop'
+import CursorMascot from './CursorMascot'
 import './Sponsor.css'
 
 /*
@@ -267,6 +268,8 @@ export default function SponsorPage() {
           </footer>
         </main>
       </div>
+
+      <CursorMascot />
     </>
   )
 }
