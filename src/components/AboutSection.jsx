@@ -2,6 +2,9 @@ import photoOne from '../assets/2024/2024-3.webp'
 import photoTwo from '../assets/2025/2025-1.webp'
 import photoThree from '../assets/2025/2025-2.webp'
 import photoFour from '../assets/2024/2024-4.webp'
+import logoCodecrafters from '../assets/sponsorlogos/codecrafters.svg'
+import logoN8n from '../assets/sponsorlogos/n8n.webp'
+import logoYcf from '../assets/sponsorlogos/ycf.webp'
 import PalmTree from './PalmTree'
 import usePopIn from './usePopIn'
 import './About.css'
@@ -29,6 +32,18 @@ const PHOTOS = [
   { area: 'two', ratio: '1 / 1', src: photoTwo, alt: 'Neodev 2025' },
   { area: 'three', ratio: '3 / 4', src: photoThree, alt: 'Neodev 2025' },
   { area: 'four', ratio: '16 / 9', src: photoFour, alt: 'Neodev 2024' },
+]
+
+/*
+ * The sponsor wall under the drift. `height` is the one size each logo is ever
+ * painted at — tools/photos.mjs cuts the rasters to twice it — and is set per
+ * logo so a wordmark and a round badge carry the same visual weight. `dark`
+ * marks a logo drawn in black, which the night sand would swallow.
+ */
+const SPONSORS = [
+  { name: 'CodeCrafters', href: 'https://codecrafters.io', src: logoCodecrafters, height: 96, dark: true },
+  { name: 'n8n', href: 'https://n8n.io', src: logoN8n, height: 60 },
+  { name: 'Youth Creativity Fund', href: 'https://youthcreativityfund.ca', src: logoYcf, height: 168, dark: true },
 ]
 
 /** Menu titles on the brief window. Decorative — they do not open anything. */
@@ -155,6 +170,28 @@ export default function AboutSection() {
             ))}
           </ul>
         </div>
+
+        <section className="thanks" aria-labelledby="thanks-title">
+          <h3 className="thanks-title" id="thanks-title">
+            Thank you to our sponsors!
+          </h3>
+          <ul className="thanks-logos">
+            {SPONSORS.map((sponsor, i) => (
+              <li key={sponsor.name} className="pop" style={{ '--pop-delay': `${i * 110}ms` }}>
+                <a className="thanks-link" href={sponsor.href} target="_blank" rel="noopener noreferrer">
+                  <img
+                    className={`thanks-logo${sponsor.dark ? ' thanks-logo--dark' : ''}`}
+                    src={sponsor.src}
+                    alt={sponsor.name}
+                    style={{ height: sponsor.height }}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </section>
   )

@@ -656,6 +656,65 @@
   }
 }
 
+/* ------------------------------------------------------------ the sponsors */
+
+.thanks {
+  margin-top: clamp(56px, 10vh, 110px);
+  text-align: center;
+}
+
+/* The big sign's neon, a few steps down the scale. */
+.thanks-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-stat);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 clamp(28px, 5vh, 52px);
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.85),
+    0 0 22px rgba(255, 106, 213, 0.9),
+    0 0 48px rgba(193, 59, 214, 0.7);
+}
+
+.thanks-logos {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(28px, 6vw, 88px);
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * The link is the box the press moves, so it is a flex item in its own right
+ * rather than an inline `<a>` the shared `translate` would have no effect on.
+ */
+.thanks-link {
+  display: flex;
+  padding: 12px;
+
+  &:focus-visible {
+    outline: 2px dashed #ff6ad5;
+    outline-offset: 4px;
+  }
+}
+
+/* Height comes inline from AboutSection.jsx and is the only size each is ever painted at. */
+.thanks-logo {
+  display: block;
+  width: auto;
+}
+
+/* Drawn in black for a white page; on the night sand they read in white. */
+.thanks-logo--dark {
+  filter: invert(1);
+}
+
 /* ------------------------------------------------------------ the pop-in
 
    Every window and image in the section opens the way a window did on the

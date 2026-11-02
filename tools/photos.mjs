@@ -67,6 +67,14 @@ const JOBS = [
    * pixel format below is chosen per file rather than left to ffmpeg.
    */
   ['../../public/logo.png', 'mascot.webp', 112, 1],
+  /*
+   * About — the sponsor logos under the drift. `.thanks-logo` paints each at a
+   * fixed height set in AboutSection.jsx, at every width, so twice that: YCF
+   * at 168px tall, n8n at 60px. Ratios are the masters' own, so nothing is cut.
+   * Codecrafters arrived as an SVG and ships as one.
+   */
+  ['sponsorlogos/ycf.png', 'sponsorlogos/ycf.webp', 336, 823 / 834],
+  ['sponsorlogos/n8n.png', 'sponsorlogos/n8n.webp', 564, 657 / 140],
 ]
 
 const run = (args) =>
