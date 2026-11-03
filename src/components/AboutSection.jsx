@@ -17,7 +17,7 @@ const BRIEF = [
 
 /** The three figures the front page leads with. */
 const STATS = [
-  { value: '$1000+', label: 'In prizes' },
+  { value: '$10000+', label: 'In prizes' },
   { value: '80+', label: 'Participants' },
   { value: '14', label: 'Hours' },
 ]
