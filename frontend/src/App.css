@@ -444,8 +444,12 @@
  * The secondary action: no fill, no border, just the label and an underline,
  * wearing the same neon glow as the subtitles above it. A flex item, so the
  * shared press in index.css moves it like any other control.
+ *
+ * Not called `.sponsor-link`: EasyList, the filter list under most ad
+ * blockers, hides that class on every site, so the link vanished for anyone
+ * running one. See "Class names" in CLAUDE.md.
  */
-.sponsor-link {
+.hero-link {
   font-family: var(--pixel);
   font-size: var(--fs-button);
   letter-spacing: 0.1em;

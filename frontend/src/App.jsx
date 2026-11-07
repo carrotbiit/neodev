@@ -59,7 +59,7 @@ function App() {
             <a className="signup-cta" href={SIGNUP_HREF}>
               Sign Up!
             </a>
-            <a className="sponsor-link" href={SPONSOR_HREF}>
+            <a className="hero-link" href={SPONSOR_HREF}>
               Sponsor Us
             </a>
           </div>
