@@ -1,3 +1,4 @@
+import { signupLink, useSignedIn } from '../signup/session'
 import './Masthead.css'
 
 /*
@@ -20,6 +21,14 @@ const NAV = [
  */
 const SPONSOR = { label: 'Sponsor', href: '/sponsor' }
 
+/*
+ * The sign-up page is another document, so this is a navigation like Sponsor.
+ * Its words and address depend on whether the reader is signed in — Sign Up,
+ * or View Application — and come from `signupLink`, which the hero's button
+ * shares. The sign-up page has no masthead of its own, so this link is never
+ * drawn on the page it points at.
+ */
+
 /** The title screen, for the section links to be relative to. */
 const HOME = '/'
 
@@ -34,7 +43,7 @@ const SOCIALS = [
 ]
 
 /**
- * @param {'home' | 'sponsor' | 'signup'} [page]
+ * @param {'home' | 'sponsor'} [page]
  *   Which of the site's documents this masthead is being drawn on. It is
  *   the one thing the bar cannot work out for itself, and both of the things
  *   below that make a link smart are decided by it.
@@ -56,6 +65,8 @@ export default function Masthead({ page = 'home' }) {
    * and `jumpTo` puts them where they asked to go on arrival.
    */
   const base = onHome ? '' : HOME
+
+  const signup = signupLink(useSignedIn())
 
   /*
    * Clicking Sponsor while already on the sponsor page. Left alone it would
@@ -97,6 +108,9 @@ export default function Masthead({ page = 'home' }) {
             >
               {SPONSOR.label}
             </a>
+          </li>
+          <li>
+            <a href={signup.href}>{signup.label}</a>
           </li>
         </ul>
       </nav>

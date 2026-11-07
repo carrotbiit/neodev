@@ -55,7 +55,8 @@
   box-sizing: border-box;
   height: 100svh;
   overflow: hidden;
-  padding-top: var(--masthead-h);
+  /* No masthead on this page, so no room kept for one. */
+  padding-top: clamp(8px, 2vh, 24px);
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -174,6 +175,47 @@
   background: linear-gradient(180deg, var(--case-dark), var(--case) 40%, var(--case-dark));
   clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
   box-shadow: 0 20px 30px rgba(8, 2, 20, 0.5);
+}
+
+/* ----------------------------------------------------------------- foot
+
+   The way back to the title screen, on the desk under the machine — the same
+   button as the sponsor page's. Kept short: the page is exactly one screen.
+   A real `<a href>`, so the shared press rule already moves it; `inline-flex`
+   gives `translate` a box to move and puts the glyph beside the words.
+   -------------------------------------------------------------------------- */
+
+.signup-foot {
+  flex: none;
+  padding: 0 clamp(8px, 1.6vw, 24px) clamp(10px, 2.2vh, 24px);
+  text-align: center;
+}
+
+.signup-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(8px, 1.4vh, 14px) 24px;
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text-h);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+.signup-home-icon {
+  width: 16px;
+  height: 16px;
+  /* Sprite symbols ship dark; force them white, as the masthead's icons are. */
+  filter: brightness(0) invert(1);
 }
 
 /* ----------------------------------------------------------------- boot */
@@ -316,15 +358,6 @@
   gap: clamp(12px, 2vw, 24px);
 }
 
-.desktop-empty {
-  margin: auto;
-  max-width: 34ch;
-  font-family: var(--pixel);
-  font-size: var(--fs-label);
-  line-height: 2;
-  text-align: center;
-  color: var(--text);
-}
 
 .win--application {
   flex: 3 1 0;

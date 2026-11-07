@@ -6,6 +6,7 @@ import ContactSection from './components/ContactSection'
 import Scrollbar from './components/Scrollbar'
 import Masthead from './components/Masthead'
 import CursorMascot from './components/CursorMascot'
+import { signupLink, useSignedIn } from './signup/session'
 import './App.css'
 
 /** Event details — swap these once the venue is locked in. */
@@ -26,14 +27,18 @@ const EVENT = {
  */
 const SPONSOR_HREF = '/sponsor'
 
-/**
- * The hero's primary call to action: the sign-up page, a separate document
- * (signup.html, served extensionless by `cleanUrls`). No hash, so
- * `onNavClick` leaves it alone and it navigates like any other link.
+/*
+ * The hero's primary call to action goes to the sign-up page, a separate
+ * document (signup.html, served extensionless by `cleanUrls`). It reads Sign
+ * Up! to a stranger and View Application to someone already signed in; which
+ * one is decided in `signup/session.js`, shared with the masthead's link. No
+ * hash either way, so `onNavClick` leaves it alone.
  */
-const SIGNUP_HREF = '/signup'
 
 function App() {
+  const signedIn = useSignedIn()
+  const signup = signupLink(signedIn)
+
   return (
     <>
       {/*
@@ -56,8 +61,8 @@ function App() {
             {EVENT.date} <span aria-hidden="true">—</span> {EVENT.year}
           </p>
           <div className="hero-actions">
-            <a className="signup-cta" href={SIGNUP_HREF}>
-              Sign Up!
+            <a className="signup-cta" href={signup.href}>
+              {signedIn ? signup.label : 'Sign Up!'}
             </a>
             <a className="hero-link" href={SPONSOR_HREF}>
               Sponsor Us

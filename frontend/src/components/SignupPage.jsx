@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import Masthead from './Masthead'
 import SunBackdrop from './SunBackdrop'
 import CursorMascot from './CursorMascot'
 import {
@@ -15,6 +14,7 @@ import {
   signUp,
   submitApplication,
 } from '../signup/accounts'
+import { OPEN_PARAM } from '../signup/session'
 import './Signup.css'
 
 /*
@@ -26,6 +26,9 @@ import './Signup.css'
  * scroll axis — so it scrolls with the browser's own scrollbar. Everything to
  * do with accounts goes through `signup/accounts.js`; read the warning at the
  * top of it before relying on any of this.
+ *
+ * It carries no masthead: the machine is the whole page, and the one way off
+ * it is the Back to home page link at the foot, as on the sponsor page.
  */
 
 /** Shown once per tab, and never under reduced motion. */
@@ -40,6 +43,22 @@ const BOOT_LINES = [
   'Starting applicant terminal',
 ]
 
+/*
+ * `?open=application` — the View Application links on the title screen and
+ * masthead (see `signup/session.js`) — asks for the desktop to come up on the
+ * form rather than on Status. Read once, then dropped from the address bar with
+ * `replaceState`, so a reload or a bookmark is just the sign-up page.
+ */
+function takeInitialApp() {
+  const params = new URLSearchParams(window.location.search)
+  const app = params.get(OPEN_PARAM)
+  if (app === null) return null
+  params.delete(OPEN_PARAM)
+  const query = params.toString()
+  history.replaceState(history.state, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  return Object.hasOwn(APPS, app) ? app : null
+}
+
 function shouldBoot() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
   try {
@@ -51,6 +70,7 @@ function shouldBoot() {
 
 export default function SignupPage() {
   const [booting, setBooting] = useState(shouldBoot)
+  const [initialApp] = useState(takeInitialApp)
   /* undefined while the saved session is still being looked up. */
   const [user, setUser] = useState(undefined)
   /* Set when the server ends the session mid-visit, so log-on can say why. */
@@ -92,6 +112,7 @@ export default function SignupPage() {
     screen = (
       <Desktop
         user={user}
+        initialApp={initialApp}
         onUser={setUser}
         onExpired={() => {
           setExpired(true)
@@ -113,8 +134,6 @@ export default function SignupPage() {
 
   return (
     <>
-      <Masthead page="signup" />
-
       <div className="signup-page">
         <main className="signup-main">
           <h1 className="sr-only">Sign up for Neodev</h1>
@@ -134,6 +153,16 @@ export default function SignupPage() {
           </div>
           <div className="computer-stand" aria-hidden="true" />
         </main>
+
+        {/* The way back, as on the sponsor page — a real navigation, not a hash. */}
+        <footer className="signup-foot">
+          <a className="signup-home" href="/">
+            <svg className="signup-home-icon" aria-hidden="true">
+              <use href="/icons.svg#home-icon" />
+            </svg>
+            Back to home page
+          </a>
+        </footer>
       </div>
 
       <CursorMascot />
@@ -399,12 +428,16 @@ const APPS = {
 }
 const APP_ORDER = ['application', 'status']
 
-function Desktop({ user, onUser, onExpired, onLogOut }) {
-  /* Status opens on its own: it is the first thing a returning applicant wants. */
-  const [open, setOpen] = useState(['status'])
+function Desktop({ user, initialApp, onUser, onExpired, onLogOut }) {
+  /*
+   * Status opens on its own: it is the first thing a returning applicant
+   * wants. A View Application link asks for the form as well, in front.
+   */
+  const first = initialApp ?? 'status'
+  const [open, setOpen] = useState(() => (first === 'status' ? ['status'] : ['status', first]))
   const [minimized, setMinimized] = useState([])
   /* `front` is the window last brought up; `focusTarget` moves keyboard focus. */
-  const [front, setFront] = useState('status')
+  const [front, setFront] = useState(first)
   const [focusTarget, setFocusTarget] = useState(null)
 
   const launch = (app) => {
@@ -451,10 +484,6 @@ function Desktop({ user, onUser, onExpired, onLogOut }) {
         </ul>
 
         <div className="desktop-windows">
-          {visible.length === 0 && (
-            <p className="desktop-empty">Click Application to fill in your application, or Status to see where it stands.</p>
-          )}
-
           {visible.includes('application') && (
             <Window
               title="Application"

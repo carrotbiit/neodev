@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { REFRESH_KEY } from '../signup/session'
 
 /*
  * The site's one HTTP client for the Django backend in /backend. Anything that
@@ -20,7 +21,6 @@ import axios from 'axios'
 
 export const API_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '') || ''
 
-const REFRESH_KEY = 'neodev.refresh'
 const AUTH_PATHS = ['/api/auth/login/', '/api/auth/register/', '/api/auth/refresh/', '/api/auth/logout/']
 
 export const api = axios.create({

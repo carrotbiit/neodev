@@ -8,6 +8,7 @@
  * is never secure. `accounts.js` uses this only while `VITE_API_URL` is unset.
  */
 
+import { LOCAL_SESSION_KEY } from '../session'
 import {
   AccountError,
   EDITABLE,
@@ -21,7 +22,7 @@ import {
 } from '../model'
 
 const ACCOUNTS_KEY = 'neodev.accounts.v1'
-const SESSION_KEY = 'neodev.session.v1'
+const SESSION_KEY = LOCAL_SESSION_KEY
 
 function load() {
   try {
