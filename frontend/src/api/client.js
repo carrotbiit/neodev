@@ -1,15 +1,9 @@
-import axios from 'axios'
-import { REFRESH_KEY } from '../signup/session'
-
 /*
  * The site's one HTTP client for the Django backend in /backend. Anything that
  * talks to it goes through `api`, so the base URL, the tokens, the throttle
  * and error handling are dealt with in one place.
  *
- * `VITE_API_URL` is the backend's origin — `http://localhost:8000` with
- * `python manage.py runserver`, the Render URL in production. Every path
- * below starts with /api/. The backend must list this site's origin in its
- * CORS_ALLOWED_ORIGINS. See .env.example.
+ * `VITE_API_URL` is the backend's origin
  *
  * Auth is SimpleJWT: a short-lived access token (10 min) sent as
  * `Authorization: Bearer …`, and a refresh token (7 days) that is rotated on
@@ -18,6 +12,10 @@ import { REFRESH_KEY } from '../signup/session'
  * a request is refused because the access token has expired, the client
  * refreshes once and retries it; if that fails, the session is over.
  */
+
+import axios from 'axios'
+import { REFRESH_KEY } from '../signup/session'
+
 
 export const API_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '') || ''
 
