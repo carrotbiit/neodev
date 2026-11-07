@@ -27,8 +27,6 @@ class CustomUser(AbstractUser):
 
     # School grade, given at sign-up. Neodev is open to high school and below,
     # so 1-12. Null for accounts that aren't applicants (staff, superusers).
-    grade = models.PositiveSmallIntegerField(
-        null=True,
-        blank=True,
+    grade = models.PositiveSmallIntegerField(null=True, blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(12)],
     )

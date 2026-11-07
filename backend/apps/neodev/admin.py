@@ -6,7 +6,7 @@ from apps.neodev.models import EntryForm
 # Admin site customization
 admin.site.site_header = "Neodev Administration"
 admin.site.site_title = "Neodev Admin Portal"
-admin.site.index_title = "Welcome to Neodev Dashboard"
+admin.site.index_title = "Welcome to the Neodev Dashboard"
 
 
 # Models
