@@ -1,0 +1,1306 @@
+/* ==========================================================================
+   Sign up — an old computer on a desk.
+
+   A separate document, like the sponsor page: no wave, no virtual axis, the
+   browser's own scrollbar. The page is one machine — a plastic case, a CRT
+   screen in it — and everything the reader does happens on that screen, in
+   windows cut from the same bevelled chrome as about.txt and transmit.exe.
+
+   Every colour this page adds is in the block below, so the whole palette is
+   readable in one place. The chrome itself is the shared set in index.css.
+   Type comes from the --fs-* steps only.
+   ========================================================================== */
+
+.signup-page {
+  /* The case: the shared chrome, a shade warmer, like sun-yellowed plastic. */
+  --case: #d8cfe4;
+  --case-lit: #f4effa;
+  --case-dark: #8a7aa8;
+  --case-shadow: #4a3a6a;
+
+  /* The tube and what it shows. */
+  --glass: #07040f;
+  --phosphor: #9ef0b8;
+  --desk-top: #2b0f57;
+  --desk-bottom: #120626;
+  --desk-line: color-mix(in srgb, var(--grid) 16%, transparent);
+
+  /* Title bars, one per kind of window. */
+  --bar-pink: linear-gradient(90deg, #6d1a7a 0%, #c13bd6 55%, #ff6ad5 100%);
+  --bar-teal: linear-gradient(90deg, #0d3f63 0%, #1f7aa0 55%, #2fd3f0 100%);
+  --bar-gold: linear-gradient(90deg, #5c3110 0%, #b8791f 55%, #ffd166 100%);
+
+  /* Sunset ramps for the status readout, top to bottom like the hero's sun.
+     One per state, so where an application stands reads by colour too. */
+  --ramp-sun: linear-gradient(180deg, #ffd166 0%, #ff9f45 30%, #ff5f6d 62%, #f43b8f 100%);
+  --ramp-pink: linear-gradient(180deg, #ffc2e7 0%, #ff6ad5 55%, #c13bd6 100%);
+  --ramp-gold: linear-gradient(180deg, #fff1b8 0%, #ffd166 50%, #ff9f45 100%);
+  --ramp-green: linear-gradient(180deg, #e2ffd9 0%, #9ef0b8 45%, #2fd3a0 100%);
+  --ramp-coral: linear-gradient(180deg, #ffd1c2 0%, #ff77bd 50%, #f5308f 100%);
+
+  /* Form states. */
+  --field-error: #b3123f;
+  --field-error-bg: #ffe3ec;
+  --notice-bg: #fff4d1;
+  --notice-line: #b8791f;
+  --ok: #1d7a4a;
+  --ok-bg: #d9f7e6;
+
+  /*
+   * Exactly one screen tall, and never taller: the page does not scroll.
+   * Every box from here down to the windows passes its height on with
+   * `min-height: 0`, so a long form scrolls inside its own window, the way
+   * a window on a real desktop would, rather than stretching the page.
+   */
+  box-sizing: border-box;
+  height: 100svh;
+  overflow: hidden;
+  padding-top: var(--masthead-h);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.signup-page *,
+.signup-page *::before,
+.signup-page *::after {
+  box-sizing: border-box;
+}
+
+.signup-main {
+  flex: 1;
+  min-height: 0;
+  width: min(1640px, 100%);
+  margin: 0 auto;
+  padding: clamp(4px, 1.5vh, 16px) clamp(8px, 1.6vw, 24px) clamp(12px, 2.5vh, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ----------------------------------------------------------- the machine */
+
+.computer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: clamp(8px, 1.8vh, 22px) clamp(8px, 1.8vw, 22px) 0;
+  background: linear-gradient(180deg, var(--case-lit) 0%, var(--case) 18%, var(--case) 100%);
+  border-radius: 18px 18px 10px 10px;
+  box-shadow:
+    inset 3px 3px 0 var(--case-lit),
+    inset -3px -3px 0 var(--case-dark),
+    0 30px 60px rgba(8, 2, 20, 0.6),
+    0 0 50px rgba(255, 106, 213, 0.22);
+}
+
+/* The recess the tube sits in. */
+.crt {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(6px, 1.2vh, 14px);
+  background: var(--case-shadow);
+  border-radius: 14px;
+  box-shadow:
+    inset 3px 3px 0 var(--case-dark),
+    inset -2px -2px 0 var(--case-lit);
+}
+
+.crt-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(90deg, var(--desk-line) 0 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(180deg, var(--desk-line) 0 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(180deg, var(--desk-top), var(--desk-bottom));
+  border-radius: 18px / 22px;
+  /* The curve of the glass: dark at the corners, a little bloom in the middle. */
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.85),
+    inset 0 0 0 2px #000;
+}
+
+/* The glass's sheen and its dark corners, over everything on the screen. */
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 30% 10%, rgba(255, 255, 255, 0.07), transparent 45%);
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.55);
+}
+
+.computer-chin {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: clamp(6px, 1.1vh, 12px) clamp(6px, 1vw, 12px);
+}
+
+.computer-vents {
+  flex: 1;
+  height: 10px;
+  max-width: 220px;
+  margin-left: auto;
+  background: repeating-linear-gradient(90deg, var(--case-dark) 0 3px, transparent 3px 7px);
+  opacity: 0.6;
+}
+
+.computer-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--phosphor);
+  box-shadow: 0 0 8px var(--phosphor);
+}
+
+/* The neck and foot under the case. */
+.computer-stand {
+  flex: none;
+  width: min(320px, 50%);
+  height: clamp(10px, 2.2vh, 22px);
+  background: linear-gradient(180deg, var(--case-dark), var(--case) 40%, var(--case-dark));
+  clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
+  box-shadow: 0 20px 30px rgba(8, 2, 20, 0.5);
+}
+
+/* ----------------------------------------------------------------- boot */
+
+.boot {
+  flex: 1;
+  padding: clamp(20px, 4vw, 48px);
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  line-height: 2.2;
+  color: var(--phosphor);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--phosphor) 70%, transparent);
+
+  p {
+    margin: 0;
+    opacity: 0;
+    animation: boot-in 1ms steps(1, end) calc(var(--i) * 260ms) forwards;
+  }
+}
+
+@keyframes boot-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------- desktops */
+
+/*
+ * The wallpaper is the screen's own background — the site's night sky,
+ * gridded — with the title screen's sun standing in the middle of it. The
+ * log-on screen and the desktop are clear, laid over both.
+ */
+.screen-sun {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 46%;
+  translate: -50% -50%;
+  /* Never narrower than the log-on window, or it hides behind it. */
+  width: clamp(600px, 66vh, 900px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  /* Sinking into the grid at the bottom, the way it sits on the horizon. */
+  -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 58%, transparent 92%);
+}
+
+.screen-sun canvas {
+  display: block;
+}
+
+.boot {
+  background: var(--glass);
+}
+
+.logon,
+.desktop {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.logon {
+  align-items: center;
+  justify-content: center;
+  padding: clamp(8px, 2vh, 32px) clamp(10px, 3vw, 32px);
+}
+
+.logon-win {
+  width: min(460px, 100%);
+}
+
+.desktop-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: clamp(12px, 2vw, 28px);
+  padding: clamp(10px, 1.8vh, 24px) clamp(10px, 1.8vw, 24px);
+}
+
+.desktop-icons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: none;
+}
+
+.desk-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 92px;
+  padding: 8px 4px;
+  border: 1px dotted transparent;
+  background: none;
+  color: #fff;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 #000;
+  cursor: pointer;
+
+  .px-icon {
+    width: 44px;
+    height: 44px;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.6));
+  }
+
+  &:hover span,
+  &:focus-visible span {
+    background: #1f3fa8;
+    outline: 1px dotted #fff;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.desktop-windows {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+.desktop-empty {
+  margin: auto;
+  max-width: 34ch;
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  line-height: 2;
+  text-align: center;
+  color: var(--text);
+}
+
+.win--application {
+  flex: 3 1 0;
+  min-width: 0;
+}
+
+.win--status {
+  flex: 1 1 0;
+  min-width: 280px;
+  max-width: 380px;
+}
+
+/* The application lays its fields out by its own width, not the page's. */
+.win--application .win-body {
+  container-type: inline-size;
+}
+
+/* -------------------------------------------------------------- windows */
+
+.win {
+  display: flex;
+  flex-direction: column;
+  /* As tall as its content, and no taller than the desk it is on. */
+  max-height: 100%;
+  min-height: 0;
+  padding: 3px;
+  background: var(--chrome);
+  color: var(--chrome-ink);
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-lit),
+    inset -2px -2px 0 var(--chrome-dark),
+    6px 6px 0 rgba(0, 0, 0, 0.5);
+  animation: win-open 160ms ease-out both;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px dotted #fff;
+    outline-offset: 3px;
+  }
+}
+
+@keyframes win-open {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.win-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 6px;
+  color: #fff;
+  background: var(--bar-pink);
+}
+
+.win--teal .win-bar {
+  background: var(--bar-teal);
+}
+
+.win--gold .win-bar {
+  background: var(--bar-gold);
+}
+
+.win-bar-icon .px-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.win-title {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.win-controls {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+/* Real controls, unlike the glyphs on about.txt — these close and minimise. */
+.win-btn {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  line-height: 1;
+  color: var(--chrome-ink);
+  background: var(--chrome);
+  cursor: pointer;
+  box-shadow:
+    inset 1px 1px 0 var(--chrome-lit),
+    inset -1px -1px 0 var(--chrome-dark);
+
+  &:active {
+    box-shadow:
+      inset 1px 1px 0 var(--chrome-dark),
+      inset -1px -1px 0 var(--chrome-lit);
+  }
+
+  &:focus-visible {
+    outline: 1px dotted var(--chrome-ink);
+    outline-offset: -4px;
+  }
+}
+
+/* Sunken, and printed on paper. */
+.win-bar {
+  flex: none;
+}
+
+/* The one part of the page that scrolls, and only when its window is full. */
+.win-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 4px 1px 1px;
+  padding: clamp(14px, 2vw, 24px);
+  background: var(--paper);
+  color: var(--paper-ink);
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-dark),
+    inset -2px -2px 0 var(--chrome-lit);
+}
+
+/* --------------------------------------------------------------- log on */
+
+.logon-banner {
+  margin: calc(-1 * clamp(14px, 2vw, 24px)) calc(-1 * clamp(14px, 2vw, 24px)) clamp(12px, 2vh, 20px);
+  padding: clamp(12px, 2.2vh, 22px) 16px clamp(10px, 1.8vh, 18px);
+  text-align: center;
+  background: linear-gradient(180deg, var(--sky), #3a1470);
+}
+
+.logon-mark {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-stat);
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.7),
+    0 0 18px rgba(255, 106, 213, 0.85);
+}
+
+.logon-sub {
+  margin: 12px 0 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.logon-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: clamp(10px, 1.8vh, 18px);
+  border-bottom: 2px solid var(--chrome-dark);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--chrome-ink);
+  background: var(--chrome);
+  cursor: pointer;
+  box-shadow:
+    inset 1px 1px 0 var(--chrome-lit),
+    inset -1px 0 0 var(--chrome-dark);
+
+  &[aria-pressed='true'] {
+    background: var(--paper);
+    box-shadow:
+      inset 2px 2px 0 var(--chrome-lit),
+      inset -2px 0 0 var(--chrome-dark);
+  }
+
+  &:focus-visible {
+    outline: 1px dotted var(--chrome-ink);
+    outline-offset: -5px;
+  }
+}
+
+/* ---------------------------------------------------------------- forms */
+
+.logon-form,
+.app-form {
+  display: grid;
+  gap: clamp(16px, 2.6vh, 26px);
+}
+
+.app-fields {
+  display: grid;
+  gap: clamp(20px, 3.4vh, 34px) clamp(20px, 2.4vw, 32px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/* Two columns once the window is wide enough; the question takes both. */
+@container (min-width: 560px) {
+  .app-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .field--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+/* A grade is a number or two — the field says so by its size. */
+.input--short {
+  max-width: 12ch;
+}
+
+.field {
+  display: grid;
+  gap: 10px;
+  /* Label and answer stay together at the top when a row-mate is taller. */
+  align-content: start;
+  min-width: 0;
+}
+
+.field-label {
+  /* A <label> on inputs, a <p> on a submitted answer: no margin either way. */
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  line-height: 1.7;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-ink);
+}
+
+.input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.4;
+  color: var(--paper-ink);
+  background: #fff;
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-dark),
+    inset -2px -2px 0 var(--chrome-lit);
+
+  &:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    color: var(--paper-ink);
+    background: var(--chrome-lit);
+    opacity: 1;
+  }
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+select.input {
+  cursor: pointer;
+}
+
+.field--error .input {
+  background: var(--field-error-bg);
+}
+
+.field-hint,
+.field-error {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.4;
+}
+
+.field-hint {
+  opacity: 0.75;
+}
+
+.field-error {
+  color: var(--field-error);
+  font-weight: 600;
+}
+
+.form-alert {
+  margin: 0;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--field-error);
+  background: var(--field-error-bg);
+  border-left: 4px solid var(--field-error);
+}
+
+.notice {
+  margin: 0;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  background: var(--notice-bg);
+  border-left: 4px solid var(--notice-line);
+}
+
+.notice--locked {
+  background: var(--ok-bg);
+  border-left-color: var(--ok);
+}
+
+/* A submitted answer, printed where its input used to be. */
+.answer-text {
+  margin: 0;
+  padding: 2px 0 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--paper-ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.answer-text--empty {
+  opacity: 0.55;
+}
+
+.grade-line {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+
+  p {
+    margin: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.save-note {
+  margin: 0 auto 0 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ok);
+}
+
+/* A full sentence in pixel type is hard work — the question reads as prose. */
+.field-label--question {
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.btn {
+  padding: 11px 18px;
+  border: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  line-height: 1.3;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--chrome-ink);
+  background: var(--chrome);
+  cursor: pointer;
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-lit),
+    inset -2px -2px 0 var(--chrome-dark),
+    0 0 0 1px var(--chrome-ink);
+
+  /* Pressed: the bevel flips so the button reads as pushed into the case. */
+  &:active {
+    box-shadow:
+      inset 2px 2px 0 var(--chrome-dark),
+      inset -2px -2px 0 var(--chrome-lit),
+      0 0 0 1px var(--chrome-ink);
+  }
+
+  &:focus-visible {
+    outline: 1px dotted var(--chrome-ink);
+    outline-offset: -6px;
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.btn--primary {
+  color: #fff;
+  background: linear-gradient(180deg, #ff6ad5, #c13bd6);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.55),
+    inset -2px -2px 0 rgba(60, 10, 80, 0.55),
+    0 0 0 1px var(--chrome-ink);
+
+  &:hover {
+    background: linear-gradient(180deg, #ff8fe0, #d04fe4);
+  }
+
+  &:active {
+    box-shadow:
+      inset 2px 2px 0 rgba(60, 10, 80, 0.55),
+      inset -2px -2px 0 rgba(255, 255, 255, 0.55),
+      0 0 0 1px var(--chrome-ink);
+  }
+
+  &:focus-visible {
+    outline-color: #fff;
+  }
+}
+
+.btn--small {
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- status */
+
+.status {
+  display: grid;
+  gap: 14px;
+}
+
+/*
+ * The readout: the page's own scene in miniature — the gridded night sky of
+ * the desktop with a banded sun going down in the corner — sunk into the
+ * window like a little screen of its own. The status is painted across it in
+ * a sunset ramp that changes with where the application stands, beside a
+ * pixel LED that blinks. The one loud thing in the window, on purpose.
+ */
+.status-hero {
+  --ramp: var(--ramp-pink);
+  --tone: var(--accent);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  gap: 12px;
+  padding: clamp(16px, 2.4vh, 22px) 16px clamp(18px, 2.8vh, 26px);
+  background:
+    linear-gradient(90deg, var(--desk-line) 0 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(180deg, var(--desk-line) 0 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(180deg, var(--desk-top), var(--desk-bottom));
+  /* Sunk into the window, like every other screen on the machine. */
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-dark),
+    inset -2px -2px 0 var(--chrome-lit),
+    inset 0 0 0 4px var(--glass);
+}
+
+/* The sun, setting behind the readout: the hero's disc and its bands. */
+.status-hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: -14px;
+  bottom: -50px;
+  width: 92px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ramp-sun);
+  opacity: 0.4;
+  /* Solid top, then bands that thin out towards the horizon. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0 44%, transparent 44% 49%, #000 49% 58%, transparent 58% 65%, #000 65% 71%, transparent 71%);
+  mask-image: linear-gradient(180deg, #000 0 44%, transparent 44% 49%, #000 49% 58%, transparent 58% 65%, #000 65% 71%, transparent 71%);
+}
+
+.status-hero--submitted {
+  --ramp: var(--ramp-sun);
+  --tone: var(--gold);
+}
+
+.status-hero--waitlisted {
+  --ramp: var(--ramp-gold);
+  --tone: var(--gold);
+}
+
+.status-hero--accepted {
+  --ramp: var(--ramp-green);
+  --tone: var(--phosphor);
+}
+
+.status-hero--declined {
+  --ramp: var(--ramp-coral);
+  --tone: var(--coral-lit);
+}
+
+.status-label {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* A square LED in a bevelled socket, the kind on the front of the case. */
+.status-lamp {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  background: var(--tone);
+  box-shadow:
+    0 0 0 2px var(--glass),
+    0 0 10px var(--tone);
+  animation: status-blink 1.2s steps(1, end) infinite;
+}
+
+/* Decorative, so it cuts rather than fades, and only touches opacity. */
+@keyframes status-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* Painted in the ramp, with a hard pixel shadow and a soft glow behind it. */
+.status-badge {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-status);
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tone);
+  background: var(--ramp);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(3px 3px 0 var(--glass))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--tone) 55%, transparent));
+}
+
+.status-detail {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+}
+
+.status-steps {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+  display: grid;
+  gap: 10px;
+  border-block: 1px solid var(--chrome);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    opacity: 0.6;
+  }
+
+  li.is-done {
+    opacity: 1;
+  }
+}
+
+.status-check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  color: var(--ok);
+  background: #fff;
+  box-shadow:
+    inset 1px 1px 0 var(--chrome-dark),
+    inset -1px -1px 0 var(--chrome-lit);
+}
+
+.status-when {
+  display: block;
+  font-size: var(--fs-body);
+  opacity: 0.7;
+}
+
+.status-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+
+  /* Label over value: an email address needs the whole width of the window. */
+  div {
+    display: grid;
+    gap: 4px;
+  }
+
+  dt {
+    font-family: var(--pixel);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: var(--fs-body);
+    overflow-wrap: anywhere;
+  }
+}
+
+/* --------------------------------------------------------------- taskbar */
+
+.taskbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  background: var(--chrome);
+  color: var(--chrome-ink);
+  box-shadow: inset 0 2px 0 var(--chrome-lit);
+}
+
+.taskbar-apps {
+  list-style: none;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 160px;
+  padding: 5px 10px;
+  border: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--chrome-ink);
+  background: var(--chrome);
+  cursor: pointer;
+  box-shadow:
+    inset 1px 1px 0 var(--chrome-lit),
+    inset -1px -1px 0 var(--chrome-dark);
+
+  .px-icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* The window that is showing reads as held down, the way taskbars did it. */
+  &[aria-pressed='true'] {
+    background: var(--paper);
+    box-shadow:
+      inset 1px 1px 0 var(--chrome-dark),
+      inset -1px -1px 0 var(--chrome-lit);
+  }
+
+  &:focus-visible {
+    outline: 1px dotted var(--chrome-ink);
+    outline-offset: -4px;
+  }
+}
+
+.taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  padding-left: 8px;
+  min-width: 0;
+}
+
+.tray-user,
+.tray-clock {
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+}
+
+.tray-user {
+  min-width: 0;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tray-clock {
+  padding: 6px 8px;
+  box-shadow:
+    inset 1px 1px 0 var(--chrome-dark),
+    inset -1px -1px 0 var(--chrome-lit);
+}
+
+/* ----------------------------------------------------------------- icons */
+
+.px-icon .px-line {
+  fill: var(--chrome-ink);
+}
+
+.px-doc .px-fill {
+  fill: #fff;
+}
+
+.px-flag .px-fill {
+  fill: var(--accent);
+}
+
+.px-flag .px-accent {
+  fill: var(--chrome-dark);
+}
+
+.px-home .px-fill {
+  fill: var(--gold);
+}
+
+.px-key .px-fill {
+  fill: var(--gold);
+}
+
+/* ---------------------------------------------------------------- mobile */
+
+@media (max-width: 720px) {
+  .computer {
+    border-radius: 12px 12px 8px 8px;
+  }
+
+  .crt-screen {
+    border-radius: 10px;
+  }
+
+  .computer-stand {
+    display: none;
+  }
+
+  .screen-sun {
+    width: 92%;
+  }
+
+  /* The icons go across the top, and the windows stack under them. */
+  .desktop-area {
+    flex-direction: column;
+  }
+
+  .desktop-icons {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .desk-icon .px-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .desk-icon {
+    width: auto;
+    min-width: 72px;
+  }
+
+  /* One window at a time here (see Desktop), across the whole desk. */
+  .win--application,
+  .win--status {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* No room for the extras: keep the open windows and Log off. */
+  .tray-user,
+  .tray-clock {
+    display: none;
+  }
+
+  .task {
+    padding: 5px 7px;
+  }
+}
+
+/* ---------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .status-lamp {
+    animation: none;
+  }
+
+  .win,
+  .boot p {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* -------------------------------------------------------------- tight fits */
+
+/* The status window's one button runs the width of it, so its label never wraps. */
+.status .form-actions .btn {
+  flex: 1;
+}
+
+/* Short screens (laptops, landscape tablets): give the height to the form. */
+@media (max-height: 760px) {
+  .logon-banner {
+    padding-block: 10px;
+  }
+
+  .logon-sub {
+    display: none;
+  }
+
+  .notice {
+    padding-block: 7px;
+  }
+
+  .input {
+    padding-block: 7px;
+  }
+}
+
+/* Small phones: the taskbar keeps each window's icon and drops its name. */
+@media (max-width: 480px) {
+  .task span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .task {
+    padding: 6px 9px;
+  }
+
+  .task .px-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ------------------------------------------------------------- scrollbars
+
+   The era's own: a dithered track, a raised chrome thumb, and an arrow
+   button at each end, all cut from the same bevel as the windows. On the
+   window bodies and on the text boxes, the only things here that scroll.
+
+   Chromium and Safari draw these from the ::-webkit-scrollbar parts. The
+   standard `scrollbar-color` would switch those parts off in Chromium, so it
+   is only set where they do not exist — Firefox, which gets the colours
+   without the bevel. */
+
+.win-body::-webkit-scrollbar,
+.signup-page textarea::-webkit-scrollbar {
+  width: 18px;
+}
+
+.win-body::-webkit-scrollbar-track,
+.signup-page textarea::-webkit-scrollbar-track {
+  background-color: var(--chrome-lit);
+  background-image: repeating-conic-gradient(var(--chrome) 0 25%, transparent 0 50%);
+  background-size: 4px 4px;
+}
+
+.win-body::-webkit-scrollbar-thumb,
+.signup-page textarea::-webkit-scrollbar-thumb {
+  min-height: 32px;
+  background: var(--chrome);
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-lit),
+    inset -2px -2px 0 var(--chrome-dark),
+    inset 0 0 0 1px var(--chrome-ink);
+}
+
+.win-body::-webkit-scrollbar-thumb:active,
+.signup-page textarea::-webkit-scrollbar-thumb:active {
+  background: var(--accent);
+}
+
+.win-body::-webkit-scrollbar-button:single-button,
+.signup-page textarea::-webkit-scrollbar-button:single-button {
+  display: block;
+  height: 18px;
+  background-color: var(--chrome);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 8px 8px;
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-lit),
+    inset -2px -2px 0 var(--chrome-dark),
+    inset 0 0 0 1px var(--chrome-ink);
+}
+
+.win-body::-webkit-scrollbar-button:single-button:active,
+.signup-page textarea::-webkit-scrollbar-button:single-button:active {
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-dark),
+    inset -2px -2px 0 var(--chrome-lit),
+    inset 0 0 0 1px var(--chrome-ink);
+}
+
+/* The arrows: pixel triangles in the chrome's ink (--chrome-ink, spelled out
+   because a data URI cannot read a custom property). */
+.win-body::-webkit-scrollbar-button:single-button:vertical:decrement,
+.signup-page textarea::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%232a0f47' d='M3 2h2v1h1v1h1v1H1V4h1V3h1z'/%3E%3C/svg%3E");
+}
+
+.win-body::-webkit-scrollbar-button:single-button:vertical:increment,
+.signup-page textarea::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%232a0f47' d='M1 3h6v1H6v1H5v1H3V5H2V4H1z'/%3E%3C/svg%3E");
+}
+
+.win-body::-webkit-scrollbar-corner,
+.signup-page textarea::-webkit-scrollbar-corner {
+  background: var(--chrome);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .win-body,
+  .signup-page textarea {
+    scrollbar-color: var(--chrome-dark) var(--chrome-lit);
+  }
+}

@@ -45,3 +45,13 @@ tools/.hero-frames/
 # src/assets/wave.webp has no script and no master in the tree -- it arrived as
 # a lossless WebP that was compressed once, by hand, and the original is only
 # in the first commit. That makes it a source file, not an artifact.
+
+# ------------------------------------------------------------------- backend
+# Secrets and local state. `.env` sits at the repo root, where
+# backend/config/settings.py loads it from; .env.example is the template.
+.env
+.venv/
+__pycache__/
+*.pyc
+backend/db.sqlite3
+backend/staticfiles/
