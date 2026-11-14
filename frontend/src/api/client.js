@@ -3,7 +3,8 @@
  * talks to it goes through `api`, so the base URL, the tokens, the throttle
  * and error handling are dealt with in one place.
  *
- * `VITE_API_URL` is the backend's origin
+ * `VITE_API_URL` is the backend's origin, and it is required: there is no
+ * offline stand-in, so a build without it fails loudly here.
  *
  * Auth is SimpleJWT: a short-lived access token (10 min) sent as
  * `Authorization: Bearer …`, and a refresh token (7 days) that is rotated on
@@ -18,6 +19,10 @@ import { REFRESH_KEY } from '../signup/session'
 
 
 export const API_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '') || ''
+
+if (!API_URL) {
+  throw new Error('VITE_API_URL is not set. Point it at the backend in the root .env (see .env.example).')
+}
 
 const AUTH_PATHS = ['/api/auth/login/', '/api/auth/register/', '/api/auth/refresh/', '/api/auth/logout/']
 

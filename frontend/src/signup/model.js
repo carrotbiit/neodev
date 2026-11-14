@@ -1,10 +1,8 @@
 /*
  * What an account and an application are, independent of where they are kept.
  *
- * Both backends (`backends/local.js` and `backends/http.js`) validate with the
- * functions here before doing anything, so the reader gets the same message
- * for the same mistake either way, and the HTTP one never spends a round trip
- * on something the browser could have caught. The server must still check all
+ * `backends/http.js` validates with the functions here before doing anything,
+ * so it never spends a round trip on something the browser could have caught. The server must still check all
  * of it again — anything sent from a browser can be forged.
  */
 

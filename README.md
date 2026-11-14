@@ -62,6 +62,4 @@ Start in `root/frontend`
 
 Open http://localhost:5173/signup with the backend running.
 
-Without `VITE_API_URL` the sign-up page still works, but keeps accounts in your
-browser only — handy for working on the page's look, useless for real
-applicants.
+`VITE_API_URL` is required — the sign-up page will not load without it.

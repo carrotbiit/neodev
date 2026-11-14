@@ -14,23 +14,18 @@
  * the sign-up page either way, and the page checks the session properly and
  * shows the log-on prompt if it has lapsed.
  *
- * The two storage keys live here so that the backends that write them and
- * this module that reads them cannot drift apart.
+ * The storage key lives here so that the client that writes it and this
+ * module that reads it cannot drift apart.
  */
 
 import { useEffect, useState } from 'react'
 
 /** Where `api/client.js` keeps the SimpleJWT refresh token. */
 export const REFRESH_KEY = 'neodev.refresh'
-/** Where `backends/local.js` keeps the signed-in email. */
-export const LOCAL_SESSION_KEY = 'neodev.session.v1'
-
-/* The same test `accounts.js` uses to pick a backend, without importing it. */
-const USES_SERVER = Boolean(import.meta.env.VITE_API_URL?.trim())
 
 export function isSignedIn() {
   try {
-    return Boolean(localStorage.getItem(USES_SERVER ? REFRESH_KEY : LOCAL_SESSION_KEY))
+    return Boolean(localStorage.getItem(REFRESH_KEY))
   } catch {
     return false
   }

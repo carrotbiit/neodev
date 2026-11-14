@@ -1,6 +1,6 @@
 /*
- * The real backend: the Django app in /backend, over axios. `accounts.js`
- * uses this as soon as `VITE_API_URL` is set. Tokens, refresh and throttle
+ * The backend: the Django app in /backend, over axios, re-exported by
+ * `accounts.js`. Tokens, refresh and throttle
  * retries are handled in src/api/client.js; this file only knows the routes
  * and translates between the backend's shapes and the page's.
  *
@@ -175,8 +175,7 @@ async function writeApplication(method, url, fields) {
   }
 }
 
-/* The email argument is how the local backend knows who is asking; here the
-   token says that, so it is not sent. */
+/* The email argument is unused: the token says who is asking. */
 
 export async function saveApplication(_email, fields) {
   return writeApplication('put', '/api/entry_form/mine/', fields)
