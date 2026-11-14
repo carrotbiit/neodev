@@ -1,3 +1,4 @@
+from .dashboard import Dashboard as Dashboard
 from .entry_form import EntryForm as EntryForm
 
 from .extras import (
@@ -7,6 +8,7 @@ from .extras import (
 
 
 __all__ = [
+    "Dashboard",
     "EntryForm",
     "DefaultPage",
     "HealthCheck",

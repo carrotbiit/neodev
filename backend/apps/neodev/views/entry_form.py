@@ -30,7 +30,7 @@ class EntryForm(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gener
         return neodev_models.EntryForm.objects.filter(user=self.request.user)
 
     def _save_draft(self, request):
-        '''Applies the request's answers to the user's form. Returns (form, error response).'''
+        '''Applies the request's answers to the user's form and updates user profile fields. Returns (form, error response).'''
         form = self.get_queryset().select_for_update().first()
         if form is not None and not form.is_editable:
             return None, Response(
@@ -38,9 +38,27 @@ class EntryForm(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gener
                 status=status.HTTP_409_CONFLICT,
             )
 
+        # 1. Update the User model source of truth if name/school are in the request data
+        user = request.user
+        user_updated = False
+
+        if 'first_name' in request.data:
+            user.first_name = request.data.get('first_name')
+            user_updated = True
+        if 'last_name' in request.data:
+            user.last_name = request.data.get('last_name')
+            user_updated = True
+        if 'school' in request.data:
+            user.school = request.data.get('school')
+            user_updated = True
+
+        if user_updated:
+            user.save(update_fields=['first_name', 'last_name', 'school'])
+
+        # 2. Serialize and save the EntryForm (now containing answer1, answer2, answer3, etc.)
         serializer = self.get_serializer(form, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        return serializer.save(user=request.user), None
+        return serializer.save(user=user), None
 
     @action(detail=False, methods=['get', 'put'])
     def mine(self, request):

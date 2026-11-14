@@ -21,9 +21,7 @@ class CustomUser(AbstractUser):
 
     # vvV Custom fields Vvv
 
-    bio = models.TextField(max_length=500, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    school = models.CharField(max_length=200, blank=True)
 
     # School grade, given at sign-up. Neodev is open to high school and below,
     # so 1-12. Null for accounts that aren't applicants (staff, superusers).

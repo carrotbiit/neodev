@@ -1,0 +1,214 @@
+.dashboard-container {
+    padding: 20px;
+    max-width: 1200px;
+    color: var(--body-fg);
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.dashboard-container h1 {
+    color: var(--body-loud-color);
+    margin: 0 0 5px 0;
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: var(--body-quiet-color);
+    margin: 0;
+}
+
+.status-bar {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-family: monospace;
+    background: var(--darkened-bg);
+}
+
+.status-ok {
+    background-color: var(--message-success-bg);
+    color: var(--primary-fg);
+}
+
+.status-err {
+    background-color: var(--message-error-bg);
+    color: var(--primary-fg);
+}
+
+/* Telemetry Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--body-quiet-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--body-loud-color);
+    font-family: monospace;
+}
+
+.stat-warn { color: #d97706; }
+.stat-success { color: #059669; }
+.stat-info { color: #3b82f6; }
+.stat-err { color: #dc2626; }
+
+/* Card & Table Controls */
+.card {
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.table-controls h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--body-loud-color);
+}
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+select, .status-select {
+    padding: 6px 10px;
+    height: 34px;
+    border: 1px solid var(--border-color);
+    background-color: var(--darkened-bg);
+    color: var(--body-fg);
+    border-radius: 4px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+select:focus, .status-select:focus {
+    outline: 2px solid var(--link-selected-fg);
+    border-color: var(--link-fg);
+}
+
+/* Table */
+.table-container {
+    background: var(--darkened-bg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+th, td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+th {
+    background-color: var(--header-bg);
+    color: var(--header-color, var(--body-loud-color));
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.empty-cell {
+    text-align: center;
+    color: var(--body-quiet-color);
+    padding: 30px;
+}
+
+/* Status Badges */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-Unreviewed { background: #d97706; color: #fff; }
+.badge-Accepted { background: #059669; color: #fff; }
+.badge-Denied { background: #dc2626; color: #fff; }
+.badge-Waitlist { background: #3b82f6; color: #fff; }
+.badge-Draft { background: #6b7280; color: #fff; }
+
+/* Buttons & Links */
+.btn-secondary {
+    background: var(--darkened-bg);
+    color: var(--body-fg);
+    border: 1px solid var(--border-color);
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--link-hover-color);
+    color: var(--header-color);
+}
+
+.action-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-link {
+    color: var(--link-fg);
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.review-link:hover {
+    text-decoration: underline;
+}

@@ -41,7 +41,7 @@ class ThrottleMiddleware:
         try:
             match = resolve(request.path)
             if match.namespace == admin.site.name:
-                print('admin request -> skipped rate limiter')
+                #print('admin request -> skipped rate limiter')
                 return await self._call_next(request)
         except Resolver404:
             pass

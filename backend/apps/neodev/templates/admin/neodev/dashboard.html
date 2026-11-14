@@ -1,0 +1,91 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'neodev/admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" data-api-url="{% url 'neodev_dashboard' %}">
+    <div class="dashboard-header">
+        <div>
+            <h1>NeoDev Control Center</h1>
+            <p class="help-text">Live applicant telemetry, status filtering, and inline review controls.</p>
+        </div>
+        <button type="button" id="refresh-btn" class="btn-secondary">↻ Refresh Data</button>
+    </div>
+
+    <div id="status-bar" class="status-bar">Status: Initializing...</div>
+
+    <!-- Telemetry Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Applicants</div>
+            <div class="stat-value" id="stat-applicants">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Forms Submitted</div>
+            <div class="stat-value" id="stat-total">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Unreviewed</div>
+            <div class="stat-value stat-warn" id="stat-unreviewed">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Accepted</div>
+            <div class="stat-value stat-success" id="stat-accepted">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Waitlisted</div>
+            <div class="stat-value stat-info" id="stat-waitlisted">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Denied</div>
+            <div class="stat-value stat-err" id="stat-denied">--</div>
+        </div>
+    </div>
+
+    <!-- Submissions Card -->
+    <div class="card">
+        <div class="table-controls">
+            <h2>Applications</h2>
+            <div class="filter-controls">
+                <label for="status-filter" class="help-text">Filter by Status:</label>
+                <select id="status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="Unreviewed">Unreviewed</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Waitlist">Waitlist</option>
+                    <option value="Denied">Denied</option>
+                    <option value="Draft">Draft</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Applicant</th>
+                        <th>School</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th>Quick Action</th>
+                    </tr>
+                </thead>
+                <tbody id="submissions-tbody">
+                    <tr>
+                        <td colspan="5" class="empty-cell">Loading submissions...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    <script src="{% static 'neodev/admin/js/dashboard.js' %}"></script>
+{% endblock %}

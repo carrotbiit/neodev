@@ -20,10 +20,22 @@ class EntryForm(models.Model):
 
     # Answers. Blank is allowed so a half-finished draft can be saved; the
     # submit endpoint is what insists on the required ones (see REQUIRED).
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
-    school = models.CharField(max_length=200, blank=True)
-    answer = models.TextField(max_length=3000, blank=True)  # the application question
+    
+    @property
+    def first_name(self):
+        return self.user.first_name
+
+    @property
+    def last_name(self):
+        return self.user.last_name
+
+    @property
+    def school(self):
+        return self.user.school
+
+    answer1 = models.TextField(max_length=500, blank=True)  # the application questions
+    answer2 = models.TextField(max_length=500, blank=True)
+    answer3 = models.TextField(max_length=500, blank=True)
     dietary_restrictions = models.TextField(max_length=1000, blank=True)
     other_needs = models.TextField(max_length=1000, blank=True)
 

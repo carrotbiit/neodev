@@ -9,4 +9,5 @@ urlpatterns = [
     path('', neodev_views.DefaultPage.as_view(), name='default_page'),
     path('health/', neodev_views.HealthCheck.as_view(), name='health_check'),
     path('api/', include(router.urls)),
+    path("api/dashboard/", neodev_views.Dashboard.as_view(), name="neodev_dashboard"),
 ]
