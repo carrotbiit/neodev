@@ -7,10 +7,10 @@ from .models import CustomUser
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     '''
-    Sign-up from the site. Applicants log in with their email, so it doubles as
-    their username — TokenObtainPairView then takes it as `username`.
+    Sign-up from the site. Applicants log in with their unique username.
     '''
 
+    username = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True)
     grade = serializers.IntegerField(
@@ -22,18 +22,24 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'invalid': 'Enter your grade as a number, like 9.',
         },
     )
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
+    school = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'password_confirm', 'grade']
+        fields = ['username', 'email', 'password', 'password_confirm', 'first_name', 'last_name', 'school', 'grade']
         extra_kwargs = {'email': {'required': True, 'allow_blank': False}}
+
+    def validate_username(self, value):
+        value = value.strip()
+        if CustomUser.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError('A user with that username already exists.')
+        return value
 
     def validate_email(self, value):
         value = value.strip().lower()
-        if (
-            CustomUser.objects.filter(email__iexact=value).exists()
-            or CustomUser.objects.filter(username__iexact=value).exists()
-        ):
+        if CustomUser.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError('An account with that email already exists. Log in instead.')
         return value
 
@@ -42,7 +48,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'password_confirm': "The passwords don't match."})
 
         # The same rules as AUTH_PASSWORD_VALIDATORS, which create_user does not run.
-        candidate = CustomUser(username=data['email'], email=data['email'])
+        candidate = CustomUser(username=data.get('username'), email=data.get('email'))
         try:
             validate_password(data['password'], user=candidate)
         except DjangoValidationError as error:
@@ -52,10 +58,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password_confirm')
         return CustomUser.objects.create_user(
-            username=validated_data['email'],
+            username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            grade=validated_data['grade'],
+            grade=validated_data.get('grade'),
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            school=validated_data.get('school', ''),
         )
 
 
@@ -67,9 +76,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'username', 'email', 'grade', 'bio', 'birth_date', 'phone', 'date_joined', 'entry_form',
-        ]  # what users can see and edit
-        read_only_fields = ['id', 'username', 'email', 'grade', 'date_joined']
+            'id', 'username', 'email', 'first_name', 'last_name', 'school', 'grade', 'date_joined', 'entry_form',
+        ]
+        read_only_fields = ['id', 'username', 'email', 'date_joined']
 
     def get_entry_form(self, user):
         # Imported here: neodev depends on accounts, not the other way round.
