@@ -110,6 +110,7 @@ export async function signUp(values) {
   const body = validateSignUp(values)
   try {
     const { data } = await api.post('/api/auth/register/', {
+      username: body.email,
       email: body.email,
       password: body.password,
       password_confirm: values.confirm,
