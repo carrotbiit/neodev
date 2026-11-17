@@ -35,7 +35,7 @@ export default function usePopIn() {
         })
       },
       /* A little inset, so a thing pops once it is properly on screen. */
-      { threshold: 0.15, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0.05, rootMargin: '0px 0px -8% 0px' },
     )
 
     targets.forEach((el) => observer.observe(el))
