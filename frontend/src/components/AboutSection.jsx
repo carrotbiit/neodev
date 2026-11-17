@@ -11,7 +11,7 @@ import './About.css'
 
 /** The about window's copy — one string per paragraph. */
 const BRIEF = [
-  "NeoDev started because we noticed that most hackathons follow the same format, and we knew we could do better. In 2024, the first NeoDev was a huge hit among high schoolers, with over 100 students attending.",
+  "NeoDev started because we noticed that most hackathons follow the same format, and we knew we could do better. In 2024, the first NeoDev was a huge hit among high schoolers, with over 70 students attending.",
   "With AI constantly improving, too many hackathons have become less about working together and more about cranking out code the fastest. It's just not as fun.",
   "So how do we stand out? Big teams of ten, school versus school, and live pitching in front of judges and an audience. At our core, we're about collaboration and team dynamics.",
   "The past two years have been incredible, watching students build real connections and bring big ideas to life together. We can’t wait to see what you create next."
