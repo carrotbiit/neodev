@@ -787,6 +787,7 @@
     max-width: 460px;
     justify-self: center;
   }
+}
 
 @media (max-width: 520px) {
   .stats {
