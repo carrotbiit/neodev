@@ -36,6 +36,7 @@ class EntryForm(models.Model):
     answer1 = models.TextField(max_length=500, blank=True)  # the application questions
     answer2 = models.TextField(max_length=500, blank=True)
     answer3 = models.TextField(max_length=500, blank=True)
+    hackathons = models.IntegerField(blank=True, default=0)
     dietary_restrictions = models.TextField(max_length=1000, blank=True)
     other_needs = models.TextField(max_length=1000, blank=True)
 
@@ -55,7 +56,10 @@ class EntryForm(models.Model):
         'first_name': 'Enter your first name.',
         'last_name': 'Enter your last name.',
         'school': 'Enter your school.',
-        'answer': 'Answer the application question.',
+        'answer1': 'Answer the first application question.',
+        'answer2': 'Answer the second application question.',
+        'answer3': 'Answer the third application question.',
+        'hackathons': 'Enter your number of hackathons',
     }
 
     @property

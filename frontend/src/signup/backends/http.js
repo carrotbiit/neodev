@@ -49,7 +49,10 @@ const TO_API = {
   firstName: 'first_name',
   lastName: 'last_name',
   school: 'school',
-  answer: 'answer',
+  answer1: 'answer1',
+  answer2: 'answer2',
+  answer3: 'answer3',
+  hackathons: 'hackathons',
   dietary: 'dietary_restrictions',
   needs: 'other_needs',
 }

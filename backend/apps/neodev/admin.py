@@ -87,7 +87,7 @@ class EntryFormAdmin(admin.ModelAdmin):
             'fields': ('first_name', 'last_name', 'school')
         }),
         ('Answers', {
-            'fields': ('answer1', 'answer2', 'answer3', 'dietary_restrictions', 'other_needs')
+            'fields': ('answer1', 'answer2', 'answer3', 'hackathons', 'dietary_restrictions', 'other_needs')
         }),
         ('Review & Administration', {
             'fields': ('status', 'admin_comments'),

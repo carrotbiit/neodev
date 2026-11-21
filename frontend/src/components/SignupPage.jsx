@@ -566,9 +566,6 @@ function Taskbar({ user, open, showing, onToggle, onLogOut }) {
 
 /* ----------------------------------------------------------- application */
 
-const QUESTION =
-  'Tell us about something you have built, or something you want to build. What got you interested in it?'
-
 function ApplicationApp({ user, onUser, onExpired, onDone }) {
   const app = user.application
   const locked = !EDITABLE.includes(app.status)
@@ -617,10 +614,10 @@ function ApplicationApp({ user, onUser, onExpired, onDone }) {
     if (next) onDone()
   }
 
-  const text = (name, label, { area, rows = 3, required, autoComplete, question, wide } = {}) => {
+  const text = (name, label, { area, rows = 3, required, autoComplete, question, wide, inputMode } = {}) => {
     /* Submitted: the answers are printed, not offered for editing. */
     if (locked) {
-      const answer = values[name].trim()
+      const answer = (values[name] ?? '').toString().trim()
       return (
         <div className={`field${wide ? ' field--wide' : ''}`}>
           <p className={`field-label${question ? ' field-label--question' : ''}`}>{label}</p>
@@ -641,7 +638,8 @@ function ApplicationApp({ user, onUser, onExpired, onDone }) {
         <Tag
           className="input"
           rows={area ? rows : undefined}
-          type={area ? undefined : 'text'}
+          type={area ? undefined : inputMode === 'numeric' ? 'text' : 'text'}
+          inputMode={inputMode}
           autoComplete={autoComplete}
           value={values[name]}
           onChange={set(name)}
@@ -676,7 +674,17 @@ function ApplicationApp({ user, onUser, onExpired, onDone }) {
           <p>{user.grade}</p>
         </div>
 
-        {text('answer', QUESTION, { area: true, rows: 5, required: true, question: true, wide: true })}
+        {text('answer1', 'Tell us about something you have built, or something you want to build. It doesn\'t have to be tech related.', { area: true, rows: 5, required: true, question: true, wide: true })}
+        {text('answer2', 'Tell us about a project that didn\'t go as planned. What did you learn from it?', { area: true, rows: 5, required: true, question: true, wide: true })}
+        {text('answer3', 'What meme of 2026 are you and why?', { area: true, rows: 3, required: true, question: true, wide: true })}
+        {text('hackathons', 'How many hackathons have you been to before?', { 
+          required: true, 
+          type: 'number', 
+          min: '0', 
+          step: '1', 
+          question: true, 
+          wide: true 
+        })}
         {text('dietary', 'Dietary restrictions', { area: true })}
         {text('needs', 'Other needs or accommodations', { area: true })}
       </fieldset>

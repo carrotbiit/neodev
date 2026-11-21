@@ -20,6 +20,7 @@ class EntryForm(serializers.ModelSerializer):
             'answer1',
             'answer2',
             'answer3',
+            'hackathons',
             'dietary_restrictions',
             'other_needs',
             'status',

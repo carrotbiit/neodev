@@ -62,7 +62,10 @@ export const EMPTY_APPLICATION = {
   firstName: '',
   lastName: '',
   school: '',
-  answer: '',
+  answer1: '',
+  answer2: '',
+  answer3: '',
+  hackathons: '',
   dietary: '',
   needs: '',
 }
