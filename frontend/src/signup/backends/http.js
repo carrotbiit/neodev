@@ -69,7 +69,14 @@ const FIELD_NAMES = {
 
 function toApiFields(fields) {
   const clean = cleanFields(fields)
-  return Object.fromEntries(Object.entries(TO_API).map(([page, backend]) => [backend, clean[page]]))
+  const body = Object.fromEntries(Object.entries(TO_API).map(([page, backend]) => [backend, clean[page]]))
+  /* hackathons is an integer on the server, which refuses "". A blank one is
+     left out of a draft save (the view saves partially) and is caught by
+     validateSubmission before a submit. */
+  const hackathons = clean.hackathons.trim()
+  if (/^\d+$/.test(hackathons)) body.hackathons = Number(hackathons)
+  else delete body.hackathons
+  return body
 }
 
 function fromApiForm(form) {

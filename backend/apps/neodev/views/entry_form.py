@@ -84,7 +84,8 @@ class EntryForm(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gener
             missing = {
                 field: [message]
                 for field, message in neodev_models.EntryForm.REQUIRED.items()
-                if not getattr(form, field).strip()
+                if not str(getattr(form, field) or '').strip()
+                and getattr(form, field) != 0
             }
             if missing:
                 # Roll back is not needed: the answers are kept as a draft.

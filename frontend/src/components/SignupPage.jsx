@@ -656,12 +656,6 @@ function ApplicationApp({ user, onUser, onExpired, onDone }) {
         <p className="notice notice--locked">Submitted {formatDate(app.submittedAt)}.</p>
       )}
 
-      {error && !error.field && (
-        <p className="form-alert" role="alert">
-          {error.message}
-        </p>
-      )}
-
       <fieldset className="app-fields">
         <legend className="sr-only">Your application</legend>
 
@@ -688,6 +682,12 @@ function ApplicationApp({ user, onUser, onExpired, onDone }) {
         {text('dietary', 'Dietary restrictions', { area: true })}
         {text('needs', 'Other needs or accommodations', { area: true })}
       </fieldset>
+
+      {error && !error.field && (
+        <p className="form-alert" role="alert">
+          {error.message}
+        </p>
+      )}
 
       {!locked && (
         <div className="form-actions">

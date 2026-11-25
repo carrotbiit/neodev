@@ -75,7 +75,10 @@ export const REQUIRED = {
   firstName: 'Enter your first name.',
   lastName: 'Enter your last name.',
   school: 'Enter your school.',
-  answer: 'Answer the application question.',
+  answer1: 'Answer the first application question.',
+  answer2: 'Answer the second application question.',
+  answer3: 'Answer the third application question.',
+  hackathons: 'Enter your number of hackathons.',
 }
 
 /**
@@ -131,6 +134,8 @@ export function validateSubmission(fields) {
   for (const [field, message] of Object.entries(REQUIRED)) {
     if (!tidy[field].trim()) throw new AccountError(message, field)
   }
+  if (!/^\d+$/.test(tidy.hackathons.trim()))
+    throw new AccountError('Enter the number of hackathons as a whole number, like 0 or 2.', 'hackathons')
   return tidy
 }
 
